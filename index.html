@@ -33,6 +33,10 @@
 	// custom global variables
 	var mesh, mouseMesh;
 	var mouse = {x: 0, y: 0};
+	var imageWidth = 500;
+	var imageHeight = 500;
+	var linePoints = [];
+	var coordsOnDown = [null,null];
 	init();
 	animate();
 	// FUNCTIONS
@@ -82,9 +86,10 @@
 		// mesh = new THREE.Mesh( geometry, material );
 		// mesh.position.set(0,40,0);
 		// scene.add(mesh);
+		var imageurl = 'fbox.png';
 
-		var ImageGeometry = new THREE.PlaneGeometry( 500, 500, 10, 10);
-		var uploadedImage = new THREE.TextureLoader().load('fbox.png');
+		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 10, 10);
+		var uploadedImage = new THREE.TextureLoader().load(imageurl);
 		//var texture = new THREE.CanvasTexture('js/rocks.jpg');
 		//var ImageMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
 		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//({color: 0xffff00});
@@ -92,6 +97,7 @@
 		// mesh.position.set(0,100,0);
 
 		scene.add( mesh );
+		scene.updateMatrixWorld(true);
 
 
 		// Create a circle around the mouse and move it
@@ -104,7 +110,12 @@
 
 		// When the mouse moves, call the given function
 		document.addEventListener('mousemove', onMouseMove, false);
+
+		document.addEventListener('mousedown', onMouseDown, false);
+		document.addEventListener('mouseup', onMouseUp, false);
 	}
+
+
 
 	// Follows the mouse event
 	function onMouseMove(event) {
@@ -114,17 +125,69 @@
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-	 // Make the sphere follow the mouse
-	  var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		vector.unproject( camera );
-		var dir = vector.sub( camera.position ).normalize();
-		var distance = - camera.position.z / dir.z;
-		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-		mouseMesh.position.copy(pos);
+	 	// Make the sphere follow the mouse
+		mouseMesh.position.copy(get3dPointZAxis());
+
+		//console.log(mouse);
 
 		// Make the sphere follow the mouse
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
+	function onMouseDown(event) {
+		coordsOnDown = [mouse.x, mouse.y];
+	};
+	function onMouseUp(event) {
+		// drag event not click
+		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y)
+			return;
+
+		linePoints.push(get3dPointZAxis());
+		if(linePoints.length >= 2) {
+			//create a blue LineBasicMaterial
+			var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			var geometry = new THREE.Geometry();
+			geometry.vertices = extrapolatePoints(linePoints[0],linePoints[1]);
+			var line = new THREE.Line( geometry, material );
+			scene.add( line );
+			renderer.render( scene, camera );
+			console.log(extrapolatePoints(linePoints[0],linePoints[1]));
+			linePoints = [];
+		}
+		
+	};
+
+	function extrapolatePoints(pt1, pt2) {
+		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
+		var y_a = pt1.y + slope*(imageWidth/2 - pt1.x);
+		var y_b = pt1.y + slope*(-imageWidth/2 - pt1.x);
+
+		var x_a = (imageHeight/2 - pt1.y)/slope + pt1.x;
+		var x_b = (-imageHeight/2 - pt1.y)/slope + pt1.x;
+		var newPts = [];
+		if(Math.abs(y_a) <= imageHeight/2) {
+			newPts.push({x: 250, y: y_a, z: 0});
+		}
+		if(Math.abs(y_b) <= imageHeight/2) {
+			newPts.push({x: -250, y: y_b, z: 0});
+		}
+		if(Math.abs(x_a) <= imageWidth/2) {
+			newPts.push({x: x_a, y: 250, z: 0});
+		}
+		if(Math.abs(x_b) <= imageHeight/2) {
+			newPts.push({x: x_b, y: -250, z: 0});
+		}
+		return newPts;
+	}
+
+	function get3dPointZAxis()
+	{
+	    var vector = new THREE.Vector3(mouse.x, mouse.y, -0.5);
+		vector.unproject( camera );
+		var dir = vector.sub( camera.position ).normalize();
+		var distance = - camera.position.z / dir.z;
+		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );  
+	    return pos;
+	}
 
 
 	function animate()
