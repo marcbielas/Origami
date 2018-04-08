@@ -96,7 +96,7 @@
 
 		// Create a circle around the mouse and move it
 		// The sphere has opacity 0
-		var mouseGeometry = 	new THREE.CircleGeometry( 10, 32 );
+		var mouseGeometry = 	new THREE.SphereGeometry( 10, 32, 32 );
 		var mouseMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
 		mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
 		mouseMesh.position.z = -5;
