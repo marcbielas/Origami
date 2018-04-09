@@ -13,6 +13,8 @@
 	<script src="js/KeyboardState.js"></script>
 	<script src="js/THREEx.FullScreen.js"></script>
 	<script src="js/THREEx.WindowResize.js"></script>
+	<script type='text/javascript' src='js/dat.gui.min.js'></script>
+
 
 	<p>Upload an Image</p>
 	<input id="user-image" type="file">
@@ -32,6 +34,10 @@
 	var clock = new THREE.Clock();
 	// custom global variables
 	var mesh, mouseMesh;
+	var selectedToRotate;
+	var cutMode = true;
+	var rotateMode = selectMode = false;
+	var objects =[];
 	var mouse = {x: 0, y: 0};
 	var imageWidth = 500;
 	var imageHeight = 500;
@@ -109,15 +115,43 @@
 		mouseMesh.position.z = -5;
 		scene.add(mouseMesh);
 
+		// GUI implementation
+	  var gui = new dat.GUI();
+		parameters =
+		{
+			mode: "Cutting"
+		};
+		var selectedMode = gui.add( parameters, 'mode', [ 'Cutting', 'Selecting', 'Folding' ] ).name('Mode').listen();
+		selectedMode.onChange(function(value)
+		{  setMode(); });
+		gui.open();
+
 		// When the mouse moves, call the given function
 		document.addEventListener('mousemove', onMouseMove, false);
-
 		document.addEventListener('mousedown', onMouseDown, false);
 		document.addEventListener('mouseup', onMouseUp, false);
 	}
 
 
-
+	function setMode()
+	{
+		var value = parameters.mode;
+		if (value == "Cutting")
+		{
+			cutMode=true;
+			selectMode = rotateMode = false;
+		}
+		else if (value = "Selecting")
+		{
+			selectMode = true;
+			cutMode = rotateMode = false;
+		}
+		else
+		{
+			rotateMode = true;
+			cutMode = selectMode = false;
+		}
+	}
 	// Follows the mouse event
 	function onMouseMove(event) {
 
@@ -142,24 +176,45 @@
 		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y)
 			return;
 
-		linePoints.push(get3dPointZAxis());
-		if(linePoints.length >= 2) {
-			//create a blue LineBasicMaterial
-			var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-			var geometry = new THREE.Geometry();
-			geometry.vertices = extrapolatePoints(linePoints[0],linePoints[1]);
-			var line = new THREE.Line( geometry, material );
-			scene.add( line );
-			renderer.render( scene, camera );
-			var result = extrapolatePoints(linePoints[0],linePoints[1]);
-			linePoints = result[0];
-			var situation = result[1];
-			// console.log(linePoints);
-			// console.log(situation);
-			subdivide (mesh, linePoints[0], linePoints[1], situation);
-			linePoints = [];
+		if (cutMode)
+		{
+			linePoints.push(get3dPointZAxis());
+			if(linePoints.length >= 2) {
+				//create a blue LineBasicMaterial
+				var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+				var geometry = new THREE.Geometry();
+				geometry.vertices = extrapolatePoints(linePoints[0],linePoints[1]);
+				var line = new THREE.Line( geometry, material );
+				scene.add( line );
+				renderer.render( scene, camera );
+				var result = extrapolatePoints(linePoints[0],linePoints[1]);
+				linePoints = result[0];
+				var situation = result[1];
+				// console.log(linePoints);
+				// console.log(situation);
+				subdivide (mesh, linePoints[0], linePoints[1], situation);
+				linePoints = [];
+			}
 		}
-		
+		if (selectMode)
+		{
+			var mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,
+												-( event.clientY / window.innerHeight ) * 2 + 1,
+												0.5 );
+			var raycaster =  new THREE.Raycaster();
+			raycaster.setFromCamera( mouse3D, camera );
+			var intersects = raycaster.intersectObjects( objects );
+			if ( intersects.length > 0 )
+			{
+				intersects[ 0 ].object.material.color.setHex(0xffffff);
+				selectedToRotate = intersects[ 0 ].object;
+
+			}
+		}
+		if (rotateMode)
+		{
+
+		}
 	};
 
 	function subdivide (mesh , pt1, pt2, situation) {
@@ -167,7 +222,7 @@
 		scene.remove(mesh);
 
 		//coordinate automation
-		
+
 		var plane1 = new THREE.Geometry();
 		var plane2 = new THREE.Geometry();
 		//top left corner
@@ -226,7 +281,7 @@
 			var w3 = new THREE.Vector3(pt2.x , pt2.y);
 			var w4 = new THREE.Vector3(-250, -250);
 		//left right cut
-		} 
+		}
 		else if (situation == 5) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
 			var v2 = new THREE.Vector3(-250, 250);
@@ -238,7 +293,7 @@
 			var w3 = new THREE.Vector3(250, -250);
 			var w4 = new THREE.Vector3(-250, -250);
 
-		} 
+		}
 		//for 3-1 divisions
 		if (situation < 4) {
 			plane1.vertices.push(v1);
@@ -250,7 +305,7 @@
 			plane2.vertices.push(w2);
 			plane2.vertices.push(w3);
 			plane2.vertices.push(w4);
-			plane2.vertices.push(w5);	
+			plane2.vertices.push(w5);
 		} else if (situation > 3) {
 			plane1.vertices.push(v1);
 			plane1.vertices.push(v2);
@@ -266,10 +321,11 @@
 			plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
 			plane2.faces.push( new THREE.Face3( 2, 3, 0 ) );
 		}
-		
+
 		var material1 = new THREE.MeshBasicMaterial({color : 0xff0000, side: THREE.DoubleSide});
 		var mesh = new THREE.Mesh( plane1, material1 );
 		scene.add(mesh);
+		objects.push(mesh);
 
 		var material2 = new THREE.MeshBasicMaterial({color : 0x0000ff, side: THREE.DoubleSide});
 
@@ -290,12 +346,13 @@
 		} else {
 			mesh2 = new THREE.Mesh( plane2, material2 );
 		}
-		
-		
+
+
 		scene.add(mesh2);
+		objects.push(mesh2);
 
 		// To Do
-		/* 
+		/*
 		FOR TUESDAY
 		3. Implement 1 SHAPE Folding
 		*/
@@ -358,7 +415,7 @@
 		vector.unproject( camera );
 		var dir = vector.sub( camera.position ).normalize();
 		var distance = - camera.position.z / dir.z;
-		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );  
+		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
 	    return pos;
 	}
 
