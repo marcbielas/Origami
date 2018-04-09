@@ -227,15 +227,15 @@
 		var geometry = new THREE.Geometry();
 
 		geometry.vertices = vertices;
-
+		console.log(vertices);
 		triangles = THREE.ShapeUtils.triangulateShape( vertices, holes );
+		console.log(triangles);
 
 		for( var i = 0; i < triangles.length; i++ ){
 
 		    geometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
 
 		}
-
 		mesh2 = new THREE.Mesh( geometry, material2 );
 		scene.add(mesh2);
 
@@ -261,11 +261,6 @@
 		var right = 0;
 		var top = 0;
 		var bottom = 0;
-		//point is on right
-		if(Math.abs(y_a) <= imageHeight/2) {
-			newPts.push({x: 250, y: y_a, z: 0});
-			right = 1;
-		}
 		//point is on left
 		if(Math.abs(y_b) <= imageHeight/2) {
 			newPts.push({x: -250, y: y_b, z: 0});
@@ -275,6 +270,11 @@
 		if(Math.abs(x_a) <= imageWidth/2) {
 			newPts.push({x: x_a, y: 250, z: 0});
 			top = 1;
+		}
+		//point is on right
+		if(Math.abs(y_a) <= imageHeight/2) {
+			newPts.push({x: 250, y: y_a, z: 0});
+			right = 1;
 		}
 		//point is on bottom
 		if(Math.abs(x_b) <= imageHeight/2) {
