@@ -42,6 +42,7 @@
 	var imageWidth = 500;
 	var imageHeight = 500;
 	var linePoints = [];
+	var currentCut = [];
 	var coordsOnDown = [null,null];
 	init();
 	animate();
@@ -141,7 +142,7 @@
 			cutMode=true;
 			selectMode = rotateMode = false;
 		}
-		else if (value = "Selecting")
+		else if (value == "Selecting")
 		{
 			selectMode = true;
 			cutMode = rotateMode = false;
@@ -177,7 +178,7 @@
 			return;
 
 		if (cutMode)
-		{
+		{	
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
 				//create a blue LineBasicMaterial
@@ -190,9 +191,10 @@
 				var result = extrapolatePoints(linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
-				// console.log(linePoints);
-				// console.log(situation);
 				subdivide (mesh, linePoints[0], linePoints[1], situation);
+				var c1 = new THREE.Vector3(linePoints[0].x, linePoints[0].y, linePoints[0].z);
+				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
+				currentCut = [c1,c2];
 				linePoints = [];
 			}
 		}
@@ -205,16 +207,34 @@
 			raycaster.setFromCamera( mouse3D, camera );
 			var intersects = raycaster.intersectObjects( objects );
 			if ( intersects.length > 0 )
-			{
+			{	
+				if(selectedToRotate) {
+					selectedToRotate.material.color.setHex(0x0000ff);
+				}
 				intersects[ 0 ].object.material.color.setHex(0xffffff);
 				selectedToRotate = intersects[ 0 ].object;
 
 			}
 		}
 		if (rotateMode)
-		{
+		{	
+			if(currentCut.length < 2 || !selectedToRotate) return;
 
+			var axis = new THREE.Vector3();
+			axis.subVectors(currentCut[0],currentCut[1]);
+			rotateAroundObjectAxis(selectedToRotate, axis, 1)
+			currentCut = [];
 		}
+	};
+
+	// Rotate an object around an axis in object space
+	function rotateAroundObjectAxis( object, axis, radians ) {
+
+	    var rotationMatrix = new THREE.Matrix4();
+
+	    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+	    object.matrix.multiply( rotationMatrix );                       // post-multiply
+	    object.rotation.setFromRotationMatrix( object.matrix );
 	};
 
 	function subdivide (mesh , pt1, pt2, situation) {
