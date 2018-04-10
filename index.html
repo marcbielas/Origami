@@ -44,6 +44,7 @@
 	var linePoints = [];
 	var currentCut = [];
 	var coordsOnDown = [null,null];
+	var curRotation = 0;
 	init();
 	animate();
 	// FUNCTIONS
@@ -164,6 +165,18 @@
 	 	// Make the sphere follow the mouse
 		mouseMesh.position.copy(get3dPointZAxis());
 
+		if (rotateMode)
+		{
+			if(currentCut.length < 2 || !selectedToRotate) return;
+			// selectedToRotate.rotation.y = 1;
+			// selectedToRotate.rotation.x = 1;
+			var axis = new THREE.Vector3();
+			axis.subVectors(currentCut[0],currentCut[1]);
+			rotateAroundObjectAxis(selectedToRotate, axis, -curRotation);
+			curRotation += Math.PI/100;
+			rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
+		}
+
 		//console.log(mouse);
 
 		// Make the sphere follow the mouse
@@ -178,7 +191,7 @@
 			return;
 
 		if (cutMode)
-		{	
+		{
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
 				//create a blue LineBasicMaterial
@@ -207,7 +220,7 @@
 			raycaster.setFromCamera( mouse3D, camera );
 			var intersects = raycaster.intersectObjects( objects );
 			if ( intersects.length > 0 )
-			{	
+			{
 				if(selectedToRotate) {
 					selectedToRotate.material.color.setHex(0x0000ff);
 				}
@@ -216,25 +229,33 @@
 
 			}
 		}
-		if (rotateMode)
-		{	
-			if(currentCut.length < 2 || !selectedToRotate) return;
-
-			var axis = new THREE.Vector3();
-			axis.subVectors(currentCut[0],currentCut[1]);
-			rotateAroundObjectAxis(selectedToRotate, axis, 1)
-			currentCut = [];
-		}
 	};
 
 	// Rotate an object around an axis in object space
 	function rotateAroundObjectAxis( object, axis, radians ) {
 
 	    var rotationMatrix = new THREE.Matrix4();
-
 	    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
-	    object.matrix.multiply( rotationMatrix );                       // post-multiply
-	    object.rotation.setFromRotationMatrix( object.matrix );
+			object.applyMatrix(rotationMatrix);
+			var mp = midpoint(currentCut[0], currentCut[1]);
+			var dis = distanceVector(new THREE.Vector3(), mp);
+			var multiple = ((mp.x <= 0 && mp.y <= 0)) ? -1 : 1;
+			object.position.setZ(multiple * Math.sin(radians) * dis);
+			object.position.setY(mp.y - Math.cos(radians) * mp.y);
+			object.position.setX(mp.x - Math.cos(radians) * mp.x);
+	};
+
+	function midpoint(v1, v2) {
+		return new THREE.Vector3((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
+	}
+
+	function distanceVector( v1, v2 )
+	{
+	    var dx = v1.x - v2.x;
+	    var dy = v1.y - v2.y;
+	    var dz = v1.z - v2.z;
+
+	    return Math.sqrt( dx * dx + dy * dy + dz * dz );
 	};
 
 	function subdivide (mesh , pt1, pt2, situation) {
