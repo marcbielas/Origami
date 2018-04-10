@@ -1,7 +1,7 @@
 <!doctype html>
 	<html lang="en">
 	<head>
-	    <title>Template (Three.js)</title>
+	    <title>Origami Demo</title>
 	    <meta charset="utf-8">
 	    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
@@ -15,18 +15,15 @@
 	<script src="js/THREEx.WindowResize.js"></script>
 	<script type='text/javascript' src='js/dat.gui.min.js'></script>
 
-
-	<p>Upload an Image</p>
+	<!-- <p>Upload an Image</p>
 	<input id="user-image" type="file">
-	<p> Make the image <input id="someInput" type="button" onClick="main()"></p>
+	<p> Make the image <input id="someInput" type="button" onClick="main()"></p> -->
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
-	/*
-		Three.js "tutorials by example"
-		Author: Lee Stemkoski
-		Date: July 2013 (three.js v59dev)
-	 */
+
+	//THREEjs template from Lee Stemkoski
+
 	// MAIN
 	// standard global variables
 	var container, scene, camera, renderer, controls;
@@ -47,6 +44,7 @@
 	var curRotation = 0;
 	init();
 	animate();
+
 	// FUNCTIONS
 	function init()
 	{
@@ -85,15 +83,13 @@
 
 		scene.add(skyBox);
 
-		////////////
-		// CUSTOM //
-		////////////
-
 		// var geometry = new THREE.SphereGeometry( 30, 32, 16 );
 		// var material = new THREE.MeshLambertMaterial( { color: 0x000088 } );
 		// mesh = new THREE.Mesh( geometry, material );
 		// mesh.position.set(0,40,0);
 		// scene.add(mesh);
+
+		// UPLOAD IMAGE
 		var imageurl = 'fbox.png';
 
 		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 10, 10);
@@ -104,10 +100,8 @@
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
 		console.log(mesh);
 		// mesh.position.set(0,100,0);
-
 		scene.add( mesh );
 		scene.updateMatrixWorld(true);
-
 
 		// Create a circle around the mouse and move it
 		// The sphere has opacity 0
@@ -134,7 +128,7 @@
 		document.addEventListener('mouseup', onMouseUp, false);
 	}
 
-
+	// Set User Input Mode
 	function setMode()
 	{
 		var value = parameters.mode;
@@ -154,6 +148,7 @@
 			cutMode = selectMode = false;
 		}
 	}
+
 	// Follows the mouse event
 	function onMouseMove(event) {
 
@@ -176,10 +171,6 @@
 			curRotation += Math.PI/100;
 			rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
 		}
-
-		//console.log(mouse);
-
-		// Make the sphere follow the mouse
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
 	function onMouseDown(event) {
@@ -232,8 +223,8 @@
 	};
 
 	// Rotate an object around an axis in object space
-	function rotateAroundObjectAxis( object, axis, radians ) {
-
+	function rotateAroundObjectAxis( object, axis, radians )
+	{
 	    var rotationMatrix = new THREE.Matrix4();
 	    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
 			object.applyMatrix(rotationMatrix);
@@ -245,7 +236,8 @@
 			object.position.setX(mp.x - Math.cos(radians) * mp.x);
 	};
 
-	function midpoint(v1, v2) {
+	function midpoint(v1, v2)
+	{
 		return new THREE.Vector3((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
 	}
 
@@ -258,7 +250,8 @@
 	    return Math.sqrt( dx * dx + dy * dy + dz * dz );
 	};
 
-	function subdivide (mesh , pt1, pt2, situation) {
+	function subdivide (mesh , pt1, pt2, situation)
+	{
 
 		scene.remove(mesh);
 
@@ -388,15 +381,9 @@
 			mesh2 = new THREE.Mesh( plane2, material2 );
 		}
 
-
 		scene.add(mesh2);
 		objects.push(mesh2);
 
-		// To Do
-		/*
-		FOR TUESDAY
-		3. Implement 1 SHAPE Folding
-		*/
 	}
 
 	function extrapolatePoints(pt1, pt2) {
@@ -450,16 +437,16 @@
 		return result;
 	}
 
+	// Calculate Z axis from unprojected mouse click
 	function get3dPointZAxis()
 	{
-	    var vector = new THREE.Vector3(mouse.x, mouse.y, -0.5);
+		var vector = new THREE.Vector3(mouse.x, mouse.y, -0.5);
 		vector.unproject( camera );
 		var dir = vector.sub( camera.position ).normalize();
 		var distance = - camera.position.z / dir.z;
 		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
-	    return pos;
+		return pos;
 	}
-
 
 	function animate()
 	{
