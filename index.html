@@ -34,6 +34,8 @@
 	var selectedToRotate;
 	var cutMode = true;
 	var rotateMode = selectMode = false;
+	//different from rotateMode, determines whether you are currently in drag rotation
+	var rotateOn = false;
 	var objects =[];
 	var mouse = {x: 0, y: 0};
 	var imageWidth = 500;
@@ -160,7 +162,7 @@
 	 	// Make the sphere follow the mouse
 		mouseMesh.position.copy(get3dPointZAxis());
 
-		if (rotateMode)
+		if (rotateMode && rotateOn)
 		{
 			if(currentCut.length < 2 || !selectedToRotate) return;
 			// selectedToRotate.rotation.y = 1;
@@ -168,18 +170,26 @@
 			var axis = new THREE.Vector3();
 			axis.subVectors(currentCut[0],currentCut[1]);
 			rotateAroundObjectAxis(selectedToRotate, axis, -curRotation);
-			curRotation += Math.PI/100;
+			var sign = 1;
+			if (coordsOnDown[0] > mouse.x) {
+				sign = -1;
+			}
+			curRotation = sign * Math.PI * distance2D(coordsOnDown[0], coordsOnDown[1], mouse.x, mouse.y);
+			//curRotation += Math.PI/100;
 			rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
 		}
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
 	function onMouseDown(event) {
 		coordsOnDown = [mouse.x, mouse.y];
+		rotateOn = true;
 	};
 	function onMouseUp(event) {
 		// drag event not click
-		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y)
+		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y) {
+			rotateOn = false;
 			return;
+		}
 
 		if (cutMode)
 		{
@@ -220,6 +230,7 @@
 
 			}
 		}
+		rotateOn = false;
 	};
 
 	// Rotate an object around an axis in object space
@@ -248,6 +259,13 @@
 	    var dz = v1.z - v2.z;
 
 	    return Math.sqrt( dx * dx + dy * dy + dz * dz );
+	};
+
+	function distance2D (x1, y1, x2, y2)
+	{
+		var dx = x1 - x2;
+		var dy = y1 - y2;
+		return Math.sqrt( dx * dx + dy * dy);
 	};
 
 	function subdivide (mesh , pt1, pt2, situation)
@@ -452,7 +470,11 @@
 	{
 	  	requestAnimationFrame( animate );
 		render();
-		update();
+		//do not move camera if folding
+		if (rotateOn && rotateMode){
+		} else {
+			update();
+		}
 	}
 	function update()
 	{
