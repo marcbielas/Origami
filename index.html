@@ -128,6 +128,7 @@
 		document.addEventListener('mousemove', onMouseMove, false);
 		document.addEventListener('mousedown', onMouseDown, false);
 		document.addEventListener('mouseup', onMouseUp, false);
+		document.addEventListener("keydown", onDocumentKeyDown, false);
 	}
 
 	// Set User Input Mode
@@ -232,6 +233,15 @@
 		}
 		rotateOn = false;
 	};
+	function onDocumentKeyDown(event) {
+		var keyCode = event.which;
+		if (selectedToRotate) {
+			if (keyCode == 68) {
+				console.log("Hello");
+					scene.remove(selectedToRotate);
+			}
+		}
+};
 
 	// Rotate an object around an axis in object space
 	function rotateAroundObjectAxis( object, axis, radians )
@@ -478,15 +488,7 @@
 	}
 	function update()
 	{
-		if ( keyboard.pressed("z") )
-		{
-			camera.position.set(0,2000,2000);
-			camera.lookAt(scene.position);
-			controls.update();
-		}
-
 		controls.update();
-
 	}
 	function render()
 	{
