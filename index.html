@@ -32,8 +32,8 @@
 	// custom global variables
 	var mesh, mouseMesh;
 	var selectedToRotate;
-	var cutMode = true;
-	var rotateMode = selectMode = false;
+	var selectMode = true;
+	var rotateMode = cutMode = false;
 	//different from rotateMode, determines whether you are currently in drag rotation
 	var rotateOn = false;
 	var objects =[];
@@ -114,6 +114,7 @@
 		console.log(mesh);
 		// mesh.position.set(0,100,0);
 		scene.add( mesh );
+		objects.push(mesh);
 		scene.updateMatrixWorld(true);
 
 		// Create a circle around the mouse and move it
@@ -128,9 +129,9 @@
 	  var gui = new dat.GUI();
 		parameters =
 		{
-			mode: "Cutting"
+			mode: "Selecting"
 		};
-		var selectedMode = gui.add( parameters, 'mode', [ 'Cutting', 'Selecting', 'Folding' ] ).name('Mode').listen();
+		var selectedMode = gui.add( parameters, 'mode', [ 'Selecting', 'Cutting', 'Folding' ] ).name('Mode').listen();
 		selectedMode.onChange(function(value)
 		{  setMode(); });
 		gui.open();
@@ -205,6 +206,7 @@
 
 		if (cutMode)
 		{
+			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
 				//create a blue LineBasicMaterial
@@ -217,7 +219,7 @@
 				var result = extrapolatePoints(linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
-				subdivide (mesh, linePoints[0], linePoints[1], situation);
+				subdivide (selectedToRotate, linePoints[0], linePoints[1], situation);
 				var c1 = new THREE.Vector3(linePoints[0].x, linePoints[0].y, linePoints[0].z);
 				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
 				currentCut = [c1,c2];
@@ -235,10 +237,12 @@
 			if ( intersects.length > 0 )
 			{
 				if(selectedToRotate) {
+					//highlight
 					selectedToRotate.material.color.setHex(0x0000ff);
 				}
 				intersects[ 0 ].object.material.color.setHex(0xffffff);
 				selectedToRotate = intersects[ 0 ].object;
+				console.log("object selected");
 
 			}
 		}
@@ -248,7 +252,7 @@
 		var keyCode = event.which;
 		if (selectedToRotate) {
 			if (keyCode == 68) {
-				console.log("Hello");
+				//console.log("Hello");
 					scene.remove(selectedToRotate);
 			}
 		}
@@ -293,6 +297,7 @@
 	{
 
 		scene.remove(mesh);
+		objects.pop();
 
 		//coordinate automation
 
