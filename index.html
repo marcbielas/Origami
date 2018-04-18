@@ -15,9 +15,9 @@
 	<script src="js/THREEx.WindowResize.js"></script>
 	<script type='text/javascript' src='js/dat.gui.min.js'></script>
 
-	<!-- <p>Upload an Image</p>
-	<input id="user-image" type="file">
-	<p> Make the image <input id="someInput" type="button" onClick="main()"></p> -->
+	<p>Upload an Image</p>
+	<input id="userImage" type="file">
+	<p> Make the image <input id="someInput" type="button" onClick="main()"></p>
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
@@ -46,10 +46,14 @@
 	var currentCut = [];
 	var coordsOnDown = [null,null];
 	var curRotation = 0;
-	init();
-	animate();
 
 	// FUNCTIONS
+	function main()
+	{
+		init();
+		animate();
+	}
+
 	function init()
 	{
 		// SCENE
@@ -94,13 +98,26 @@
 		// scene.add(mesh);
 
 		// UPLOAD IMAGE
-		var imageurl = 'fbox.png';
+		 var imageurl = 'fbox.png';
+		// imageurl = document.getElementById("userImage");
+
+		// var image = document.createElement('img');
+		// var texture = new THREE.Texture (image);
+		// image.onload = function(){texture.needsUpdate = true;};
+
+		// texture.minFilter = THREE.LinearFilter;
+		//var image = document.createElement("img");
+		//var image = imageurl.toDataURL()
+		//image.src = imageurl;
+		//console.log(imageurl);
 
 		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 10, 10);
 		var uploadedImage = new THREE.TextureLoader().load(imageurl);
 		//var texture = new THREE.CanvasTexture('js/rocks.jpg');
 		//var ImageMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
 		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//({color: 0xffff00});
+		ImageMaterial.map.needsUpdate = true;
+		//var ImageMaterial = new THREE.MeshBasicMaterial({map : image, side: THREE.DoubleSide});//
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
 		console.log(mesh);
 		// mesh.position.set(0,100,0);
