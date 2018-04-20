@@ -34,8 +34,8 @@
 	// custom global variables
 	var mesh, mouseMesh;
 	var selectedToRotate;
-	var selectMode = true;
-	var rotateMode = cutMode = false;
+	var cutMode = true;
+	var rotateMode = selectMode = false;
 	//different from rotateMode, determines whether you are currently in drag rotation
 	var rotateOn = false;
 	var objects =[];
@@ -175,7 +175,7 @@
 	  var gui = new dat.GUI();
 		parameters =
 		{
-			mode: "Selecting"
+			mode: "Cutting"
 		};
 		var selectedMode = gui.add( parameters, 'mode', [ 'Selecting', 'Cutting', 'Folding' ] ).name('Mode').listen();
 		selectedMode.onChange(function(value)
@@ -266,11 +266,11 @@
 				//create a blue LineBasicMaterial
 				var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 				var geometry = new THREE.Geometry();
-				geometry.vertices = extrapolatePoints(linePoints[0],linePoints[1]);
+				geometry.vertices = extrapolatePoints(selectedToRotate, linePoints[0],linePoints[1]);
 				var line = new THREE.Line( geometry, material );
 				scene.add( line );
 				renderer.render( scene, camera );
-				var result = extrapolatePoints(linePoints[0],linePoints[1]);
+				var result = extrapolatePoints(selectedToRotate, linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
 				subdivide (selectedToRotate, linePoints[0], linePoints[1], situation);
@@ -494,13 +494,19 @@
 
 	}
 
-	function extrapolatePoints(pt1, pt2) {
-		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
-		var y_a = Math.round(pt1.y + slope*(imageWidth/2 - pt1.x));
-		var y_b = Math.round(pt1.y + slope*(-imageWidth/2 - pt1.x));
+	function extrapolatePoints(mesh, pt1, pt2) {
+		//mesh vertices
+		var topleft = mesh.geometry.vertices[0];
+		var topright = mesh.geometry.vertices[1];
+		var bottomleft = mesh.geometry.vertices[2];
+		var bottomright = mesh.geometry.vertices[3];
 
-		var x_a = Math.round((imageHeight/2 - pt1.y)/slope + pt1.x);
-		var x_b = Math.round((-imageHeight/2 - pt1.y)/slope + pt1.x);
+		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
+		var y_a = Math.round(pt1.y + slope*(topright.x - pt1.x));
+		var y_b = Math.round(pt1.y + slope*(topleft.x - pt1.x));
+
+		var x_a = Math.round((topright.y - pt1.y)/slope + pt1.x);
+		var x_b = Math.round((bottomright.y - pt1.y)/slope + pt1.x);
 		var newPts = [];
 		//flags
 		var left = 0;
@@ -508,23 +514,23 @@
 		var top = 0;
 		var bottom = 0;
 		//point is on left
-		if(Math.abs(y_b) <= imageHeight/2) {
-			newPts.push({x: -(imageWidth/2), y: y_b, z: 0});
+		if(Math.abs(y_b) <= topright.y) {
+			newPts.push({x: -(topright.x), y: y_b, z: 0});
 			left = 1;
 		}
 		//point is on top
-		if(Math.abs(x_a) <= imageWidth/2) {
-			newPts.push({x: x_a, y: (imageHeight/2), z: 0});
+		if(Math.abs(x_a) <= topright.x) {
+			newPts.push({x: x_a, y: (topright.y), z: 0});
 			top = 1;
 		}
 		//point is on right
-		if(Math.abs(y_a) <= imageHeight/2) {
-			newPts.push({x: (imageWidth/2), y: y_a, z: 0});
+		if(Math.abs(y_a) <= topright.y) {
+			newPts.push({x: (topright.x), y: y_a, z: 0});
 			right = 1;
 		}
 		//point is on bottom
-		if(Math.abs(x_b) <= imageHeight/2) {
-			newPts.push({x: x_b, y: -(imageHeight/2), z: 0});
+		if(Math.abs(x_b) <= topright.x) {
+			newPts.push({x: x_b, y: -(topright.y), z: 0});
 			bottom = 1;
 		}
 		var sitation = 0;
