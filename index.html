@@ -110,15 +110,19 @@
 		d1 = document.getElementById("d1").value;
 		d2 = document.getElementById("d2").value;
 		if (d1 && d2) {
-		if (d1 > d2) {
-		imageHeight = 500 * (d1 / d2);
-		} else {
-		imageWidth = 500 * (d2 / d1);
-		}
+			if (d1 > d2) {
+			imageHeight = 500 * (d1 / d2);
+			} else {
+				imageWidth = 500 * (d2 / d1);
+			}
 		}
 		
-		var imageurl = document.getElementById("userImage").value;
-		imageurl = imageurl.split("\\")[2];
+		var imageurl = 'fbox.png';
+		if (document.getElementById("userImage").value) {
+			imageurl = document.getElementById("userImage").value;	
+			imageurl = imageurl.split("\\")[2];
+		}
+		
 
 		// var img= new Image();
 		
