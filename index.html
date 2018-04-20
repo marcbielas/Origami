@@ -17,21 +17,12 @@
 
 	<p>Upload an Image</p>
 	<input id="userImage" type="file">
-	<p> Make the image <input id="someInput" type="button" onClick="main()"></p>
+	<p>Image Dimensions</p>
+	<input id="d1" type="text"> <input id="d2" type="text">
+	<p> Start <input id="someInput" type="button" onClick="main()"></p>
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
-
-	/* TO DO
-		1. Rotation on Axis - not translation
-		2. Max HCoord/WCoord
-		Bugs to Fix:
-		1. Movement of Scene after rotation of Shape
-		2.
-
-
-
-	*/
 
 	//THREEjs template from Lee Stemkoski
 
@@ -56,10 +47,10 @@
 	var maxWcoord = imageWidth/2;
 	var linePoints = [];
 	var currentCut = [];
-	var pastLineSegments =[];
 	var coordsOnDown = [null,null];
 	var curRotation = 0;
 	var size;
+	var foldDragDistance = 0; //sum of fold drag distances
 
 	// FUNCTIONS
 	function main()
@@ -113,6 +104,18 @@
 
 		// UPLOAD IMAGE
 		 //var imageurl = 'fbox.png';
+
+		 //dimension adaptation
+		var d1 = d2 = 1;
+		d1 = document.getElementById("d1").value;
+		d2 = document.getElementById("d2").value;
+		if (d1 && d2) {
+		if (d1 > d2) {
+		imageHeight = 500 * (d1 / d2);
+		} else {
+		imageWidth = 500 * (d2 / d1);
+		}
+		}
 		
 		var imageurl = document.getElementById("userImage").value;
 		imageurl = imageurl.split("\\")[2];
@@ -215,22 +218,28 @@
 
 		if (rotateMode && rotateOn)
 		{
+			controls.enabled = false;
 			if(currentCut.length < 2 || !selectedToRotate) return;
 			// selectedToRotate.rotation.y = 1;
 			// selectedToRotate.rotation.x = 1;
 			var axis = new THREE.Vector3();
 			axis.subVectors(currentCut[0],currentCut[1]);
 			rotateAroundObjectAxis(selectedToRotate, axis, -curRotation);
-			var sign = 1;
-			if (coordsOnDown[0] > mouse.x) {
-				sign = -1;
-			}
-			curRotation = sign * Math.PI * distance2D(coordsOnDown[0], coordsOnDown[1], mouse.x, mouse.y);
-			//curRotation += Math.PI/100;
+			
+			curRotation = updateCurRotation() + foldDragDistance;
 			rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
 		}
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
+
+	function updateCurRotation() {
+		var sign = 1;
+		if (coordsOnDown[0] > mouse.x) {
+			sign = -1;
+		}
+		return sign * Math.PI * distance2D(coordsOnDown[0], coordsOnDown[1], mouse.x, mouse.y);
+	};
+
 	function onMouseDown(event) {
 		coordsOnDown = [mouse.x, mouse.y];
 		rotateOn = true;
@@ -239,6 +248,8 @@
 		// drag event not click
 		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y) {
 			rotateOn = false;
+			controls.enabled = true;
+			foldDragDistance += updateCurRotation();
 			return;
 		}
 
@@ -257,17 +268,10 @@
 				var result = extrapolatePoints(linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
-				for (var i = 0; i < pastLineSegments.length; i++) {
-					if (isIntersecting(linePoints[0], linePoints[1], pastLineSegments[i][0], pastLineSegments[i][1])) {
-						console.log("Intersecting!");
-					}
-				}
 				subdivide (selectedToRotate, linePoints[0], linePoints[1], situation);
 				var c1 = new THREE.Vector3(linePoints[0].x, linePoints[0].y, linePoints[0].z);
 				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
 				currentCut = [c1,c2];
-				pastLineSegments.push(linePoints);
-				console.log("Past line Segs", pastLineSegments);
 				linePoints = [];
 			}
 		}
@@ -296,19 +300,12 @@
 	function onDocumentKeyDown(event) {
 		var keyCode = event.which;
 		if (selectedToRotate) {
-			if (keyCode == 68) { //Selecting "D"
+			if (keyCode == 68) {
 				//console.log("Hello");
 					scene.remove(selectedToRotate);
 			}
 		}
-	};
-	//https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
-	function isIntersecting(p1, p2, p3, p4) {
-		function CCW(p1, p2, p3) {
-				return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
-		}
-		return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
-	}
+};
 
 	// Rotate an object around an axis in object space
 	function rotateAroundObjectAxis( object, axis, radians )
@@ -491,7 +488,6 @@
 
 	}
 
-
 	function extrapolatePoints(pt1, pt2) {
 		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
 		var y_a = Math.round(pt1.y + slope*(imageWidth/2 - pt1.x));
@@ -567,11 +563,7 @@
 	{
 	  	requestAnimationFrame( animate );
 		render();
-		//do not move camera if folding
-		if (rotateOn && rotateMode){
-		} else {
-			update();
-		}
+		update();
 	}
 	function update()
 	{
