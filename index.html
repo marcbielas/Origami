@@ -45,6 +45,7 @@
 	var maxWcoord = imageWidth/2;
 	var linePoints = [];
 	var currentCut = [];
+	var pastLineSegments =[];
 	var coordsOnDown = [null,null];
 	var curRotation = 0;
 	var size;
@@ -245,10 +246,17 @@
 				var result = extrapolatePoints(linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
+				for (var i = 0; i < pastLineSegments.length; i++) {
+					if (isIntersecting(linePoints[0], linePoints[1], pastLineSegments[i][0], pastLineSegments[i][1])) {
+						console.log("Intersecting!");
+					}
+				}
 				subdivide (selectedToRotate, linePoints[0], linePoints[1], situation);
 				var c1 = new THREE.Vector3(linePoints[0].x, linePoints[0].y, linePoints[0].z);
 				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
 				currentCut = [c1,c2];
+				pastLineSegments.push(linePoints);
+				console.log("Past line Segs", pastLineSegments);
 				linePoints = [];
 			}
 		}
@@ -282,7 +290,14 @@
 					scene.remove(selectedToRotate);
 			}
 		}
-};
+	};
+	//https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
+	function isIntersecting(p1, p2, p3, p4) {
+		function CCW(p1, p2, p3) {
+				return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+		}
+		return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
+	}
 
 	// Rotate an object around an axis in object space
 	function rotateAroundObjectAxis( object, axis, radians )
