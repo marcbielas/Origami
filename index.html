@@ -51,6 +51,7 @@
 	var curRotation = 0;
 	var size;
 	var foldDragDistance = 0; //sum of fold drag distances
+	var gui;
 
 	// FUNCTIONS
 	function main()
@@ -172,7 +173,7 @@
 		scene.add(mouseMesh);
 
 		// GUI implementation
-	  var gui = new dat.GUI();
+	    gui = new dat.GUI();
 		parameters =
 		{
 			mode: "Cutting"
@@ -302,15 +303,43 @@
 		}
 		rotateOn = false;
 	};
+
+	function makeGUI(initValue) {
+		// GUI implementatio
+		if(gui)
+			gui.destroy();
+	  	gui = new dat.GUI();
+		parameters =
+		{
+			mode: initValue
+		};
+		var selectedMode = gui.add( parameters, 'mode', [ 'Selecting', 'Cutting', 'Folding' ] ).name('Mode').listen();
+		selectedMode.onChange(function(value)
+		{  setMode(); });
+		gui.open();
+
+	}
+
 	function onDocumentKeyDown(event) {
 		var keyCode = event.which;
-		if (selectedToRotate) {
-			if (keyCode == 68) {
-				//console.log("Hello");
-					scene.remove(selectedToRotate);
-			}
+		if (selectedToRotate && keyCode == 68) {
+			scene.remove(selectedToRotate);
+			
 		}
-};
+		if(keyCode == 83) {
+			selectMode = true;
+			makeGUI('Selecting');
+			CuttingMode = rotateMode = false;
+		} else if(keyCode == 67) {
+			cutMode=true;
+			makeGUI('Cutting');
+		selectMode = rotateMode = false;
+		} else if(keyCode == 70) {
+			rotateMode = true;
+			makeGUI('Folding');
+			cutMode = selectMode = false;	
+		}
+	};
 
 	// Rotate an object around an axis in object space
 	function rotateAroundObjectAxis( object, axis, radians )
@@ -352,7 +381,6 @@
 		var vertices = mesh.geometry.vertices;
 		scene.remove(mesh);
 		objects.pop();
-
 		//coordinate automation
 
 		var plane1 = new THREE.Geometry();
