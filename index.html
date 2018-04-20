@@ -152,7 +152,7 @@
 		ImageMaterial.map.needsUpdate = true;
 		//var ImageMaterial = new THREE.MeshBasicMaterial({map : image, side: THREE.DoubleSide});//
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
-		//console.log(mesh);
+		console.log(mesh);
 		// mesh.position.set(0,100,0);
 		scene.add( mesh );
 		objects.push(mesh);
@@ -344,7 +344,7 @@
 
 	function subdivide (mesh , pt1, pt2, situation)
 	{
-
+		var vertices = mesh.geometry.vertices;
 		scene.remove(mesh);
 		objects.pop();
 
@@ -356,69 +356,69 @@
 		if (situation == 0) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
 			var v2 = new THREE.Vector3(pt2.x , pt2.y);
-			var v3 = new THREE.Vector3(-maxWcoord, maxHcoord);
+			var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
 
 			var w1 = new THREE.Vector3(pt1.x, pt1.y);
 			var w2 = new THREE.Vector3(pt2.x , pt2.y);
-			var w3 = new THREE.Vector3(maxWcoord, maxHcoord);
-			var w4 = new THREE.Vector3(maxWcoord, -maxHcoord);
-			var w5 = new THREE.Vector3(-maxWcoord, -maxHcoord);
+			var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+			var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+			var w5 = new THREE.Vector3(vertices[2].x, vertices[2].y);
 		//top right corner
 		} else if (situation == 1) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
 			var v2 = new THREE.Vector3(pt2.x , pt2.y);
-			var v3 = new THREE.Vector3(maxWcoord, maxHcoord);
+			var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
 
 			var w1 = new THREE.Vector3(pt1.x, pt1.y);
 			var w2 = new THREE.Vector3(pt2.x , pt2.y);
-			var w3 = new THREE.Vector3(maxWcoord, -maxHcoord);
-			var w4 = new THREE.Vector3(-maxWcoord, -maxHcoord);
-			var w5 = new THREE.Vector3(-maxWcoord, maxHcoord);
+			var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+			var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+			var w5 = new THREE.Vector3(vertices[0].x, vertices[0].y);
 		//bottom right corner
 		} else if (situation == 2) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
 			var v2 = new THREE.Vector3(pt2.x , pt2.y);
-			var v3 = new THREE.Vector3(maxWcoord, -maxHcoord);
+			var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
 
 			var w1 = new THREE.Vector3(pt1.x, pt1.y);
 			var w2 = new THREE.Vector3(pt2.x , pt2.y);
-			var w3 = new THREE.Vector3(-maxWcoord, -maxHcoord);
-			var w4 = new THREE.Vector3(-maxWcoord, maxHcoord);
-			var w5 = new THREE.Vector3(maxWcoord, maxHcoord);
+			var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+			var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+			var w5 = new THREE.Vector3(vertices[1].x, vertices[1].y);
 		//bottom left corner
 		} else if (situation == 3) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
 			var v2 = new THREE.Vector3(pt2.x , pt2.y);
-			var v3 = new THREE.Vector3(-maxWcoord, -maxHcoord);
+			var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
 
 			var w1 = new THREE.Vector3(pt2.x , pt2.y);
 			var w2 = new THREE.Vector3(pt1.x, pt1.y);
-			var w3 = new THREE.Vector3(-maxWcoord, maxHcoord);
-			var w4 = new THREE.Vector3(maxWcoord, maxHcoord);
-			var w5 = new THREE.Vector3(maxWcoord, -maxHcoord);
+			var w3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+			var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+			var w5 = new THREE.Vector3(vertices[3].x, vertices[3].y);
 		//top bottom cut
 		} else if (situation == 4) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
-			var v2 = new THREE.Vector3(maxWcoord, maxHcoord);
-			var v3 = new THREE.Vector3(maxWcoord, -maxHcoord);
+			var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+			var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
 			var v4 = new THREE.Vector3(pt2.x , pt2.y);
 
-			var w1 = new THREE.Vector3(-maxWcoord, maxHcoord);
+			var w1 = new THREE.Vector3(vertices[0].x, vertices[0].y);
 			var w2 = new THREE.Vector3(pt1.x, pt1.y);
 			var w3 = new THREE.Vector3(pt2.x , pt2.y);
-			var w4 = new THREE.Vector3(-maxWcoord, -maxHcoord);
+			var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
 		//left right cut
 		}
 		else if (situation == 5) {
 			var v1 = new THREE.Vector3(pt1.x, pt1.y);
-			var v2 = new THREE.Vector3(-maxWcoord, maxHcoord);
-			var v3 = new THREE.Vector3(maxWcoord, maxHcoord);
+			var v2 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+			var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
 			var v4 = new THREE.Vector3(pt2.x , pt2.y);
 
 			var w1 = new THREE.Vector3(pt1.x, pt1.y);
 			var w2 = new THREE.Vector3(pt2.x , pt2.y);
-			var w3 = new THREE.Vector3(maxWcoord, -maxHcoord);
-			var w4 = new THREE.Vector3(-maxWcoord, -maxHcoord);
+			var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+			var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
 
 		}
 		//for 3-1 divisions
@@ -503,22 +503,22 @@
 		var bottom = 0;
 		//point is on left
 		if(Math.abs(y_b) <= imageHeight/2) {
-			newPts.push({x: -maxWcoord, y: y_b, z: 0});
+			newPts.push({x: -(imageWidth/2), y: y_b, z: 0});
 			left = 1;
 		}
 		//point is on top
 		if(Math.abs(x_a) <= imageWidth/2) {
-			newPts.push({x: x_a, y: maxHcoord, z: 0});
+			newPts.push({x: x_a, y: (imageHeight/2), z: 0});
 			top = 1;
 		}
 		//point is on right
 		if(Math.abs(y_a) <= imageHeight/2) {
-			newPts.push({x: maxHcoord, y: y_a, z: 0});
+			newPts.push({x: (imageWidth/2), y: y_a, z: 0});
 			right = 1;
 		}
 		//point is on bottom
 		if(Math.abs(x_b) <= imageHeight/2) {
-			newPts.push({x: x_b, y: -maxHcoord, z: 0});
+			newPts.push({x: x_b, y: -(imageHeight/2), z: 0});
 			bottom = 1;
 		}
 		var sitation = 0;
