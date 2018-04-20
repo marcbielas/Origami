@@ -59,6 +59,7 @@
 	var pastLineSegments =[];
 	var coordsOnDown = [null,null];
 	var curRotation = 0;
+	var size;
 
 	// FUNCTIONS
 	function main()
@@ -112,18 +113,43 @@
 
 		// UPLOAD IMAGE
 		 //var imageurl = 'fbox.png';
+		
 		var imageurl = document.getElementById("userImage").value;
 		imageurl = imageurl.split("\\")[2];
 
+		// var img= new Image();
+		
+		// var imwidth;
+		// var imheight;
+		// img.onload = function(){
+  //       	imwidth = this.width;
+  //       	imheight = this.height;
+  //       	alert('1 '+this.width+' '+this.height);
+  //       	alert('2 '+imwidth+' '+imheight);
+  //   	};
+  //   	img.src = imageurl;
+  		// getMeta(imageurl);
+  		
+  		// imwidth = size.w;
+  		// imheight = size.h;
+    	
+    // 	alert('3 '+imwidth+' '+imheight);
+
+
 		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 1, 1);
 		uploadedImage = new THREE.TextureLoader().load(imageurl);
+
+		// alert('4 '+imwidth+' '+imheight);
+		// console.log(imwidth);
+  //   	console.log(imheight);
+
 		//var texture = new THREE.CanvasTexture('js/rocks.jpg');
 		//var ImageMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
 		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//({color: 0xffff00});
 		ImageMaterial.map.needsUpdate = true;
 		//var ImageMaterial = new THREE.MeshBasicMaterial({map : image, side: THREE.DoubleSide});//
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
-		console.log(mesh);
+		//console.log(mesh);
 		// mesh.position.set(0,100,0);
 		scene.add( mesh );
 		objects.push(mesh);
@@ -515,6 +541,15 @@
 		}
 		var result = [newPts, situation]
 		return result;
+	}
+
+	function getMeta(url){   
+	    var img = new Image();
+	    img.onload = function(){
+	        alert( this.width+' '+ this.height );
+	        size = {w: this.width, h: this.height};
+	    };
+	    img.src = url;
 	}
 
 	// Calculate Z axis from unprojected mouse click
