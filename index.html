@@ -364,7 +364,7 @@
 	THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
     var q = new THREE.Quaternion();
     return function (point, axis, angle) {
-        q1.setFromAxisAngle(axis, angle);
+        q.setFromAxisAngle(axis, angle);
         this.quaternion.multiplyQuaternions(q, this.quaternion);
         this.position.sub(point);
         this.position.applyQuaternion(q);
