@@ -47,6 +47,7 @@
 	var maxWcoord = imageWidth/2;
 	var linePoints = [];
 	var currentCut = [];
+	var pastLineSegments =[];
 	var coordsOnDown = [null,null];
 	var curRotation = 0;
 	var size;
@@ -275,10 +276,19 @@
 				var result = extrapolatePoints(selectedToRotate, linePoints[0],linePoints[1]);
 				linePoints = result[0];
 				var situation = result[1];
+				for (var i = 0; i < pastLineSegments.length; i++) {
+					if (isIntersecting(linePoints[0], linePoints[1], pastLineSegments[i][0], pastLineSegments[i][1])) {
+					alert("You can't intersect a past cut! Please only cut a full shape.");
+						linePoints = [];
+						return;
+					}
+				}
 				subdivide (selectedToRotate, linePoints[0], linePoints[1], situation);
 				var c1 = new THREE.Vector3(linePoints[0].x, linePoints[0].y, linePoints[0].z);
 				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
 				currentCut = [c1,c2];
+				pastLineSegments.push(linePoints);
+				console.log("Past line Segs", pastLineSegments);
 				linePoints = [];
 			}
 		}
@@ -325,7 +335,6 @@
 		var keyCode = event.which;
 		if (selectedToRotate && keyCode == 68) {
 			scene.remove(selectedToRotate);
-
 		}
 		if(keyCode == 83) {
 			selectMode = true;
@@ -341,6 +350,15 @@
 			cutMode = selectMode = false;
 		}
 	};
+
+	//https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
+	// Check weather a new cut intersects an old cut
+	function isIntersecting(p1, p2, p3, p4) {
+		function CCW(p1, p2, p3) {
+				return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
+		}
+		return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
+	}
 
 	// Quaternion Rotation from https://stackoverflow.com/questions/31953608/rotate-object-on-specific-axis-anywhere-in-three-js-including-outside-of-mesh
 	THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
