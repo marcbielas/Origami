@@ -117,16 +117,16 @@
 				imageWidth = 500 * (d2 / d1);
 			}
 		}
-		
+
 		var imageurl = 'fbox.png';
 		if (document.getElementById("userImage").value) {
-			imageurl = document.getElementById("userImage").value;	
+			imageurl = document.getElementById("userImage").value;
 			imageurl = imageurl.split("\\")[2];
 		}
-		
+
 
 		// var img= new Image();
-		
+
 		// var imwidth;
 		// var imheight;
 		// img.onload = function(){
@@ -137,10 +137,10 @@
   //   	};
   //   	img.src = imageurl;
   		// getMeta(imageurl);
-  		
+
   		// imwidth = size.w;
   		// imheight = size.h;
-    	
+
     // 	alert('3 '+imwidth+' '+imheight);
 
 
@@ -230,10 +230,11 @@
 			// selectedToRotate.rotation.x = 1;
 			var axis = new THREE.Vector3();
 			axis.subVectors(currentCut[0],currentCut[1]);
-			rotateAroundObjectAxis(selectedToRotate, axis, -curRotation);
-			
+			selectedToRotate.rotateAroundWorldAxis(currentCut[0], axis.normalize(), -curRotation);
+			//rotateAroundObjectAxis(selectedToRotate, axis, -curRotation);
 			curRotation = updateCurRotation() + foldDragDistance;
-			rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
+			selectedToRotate.rotateAroundWorldAxis(currentCut[0], axis.normalize(), curRotation);
+			//rotateAroundObjectAxis(selectedToRotate, axis, curRotation)
 		}
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
@@ -324,7 +325,7 @@
 		var keyCode = event.which;
 		if (selectedToRotate && keyCode == 68) {
 			scene.remove(selectedToRotate);
-			
+
 		}
 		if(keyCode == 83) {
 			selectMode = true;
@@ -337,37 +338,50 @@
 		} else if(keyCode == 70) {
 			rotateMode = true;
 			makeGUI('Folding');
-			cutMode = selectMode = false;	
+			cutMode = selectMode = false;
 		}
 	};
 
+	// Quaternion Rotation from https://stackoverflow.com/questions/31953608/rotate-object-on-specific-axis-anywhere-in-three-js-including-outside-of-mesh
+	THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
+    var q = new THREE.Quaternion();
+    return function (point, axis, angle) {
+        q1.setFromAxisAngle(axis, angle);
+        this.quaternion.multiplyQuaternions(q, this.quaternion);
+        this.position.sub(point);
+        this.position.applyQuaternion(q);
+        this.position.add(point);
+        return this;
+    	}
+	}();
+
+	// Hack to rotate and translate - no longer needed with Quaternions
 	// Rotate an object around an axis in object space
-	function rotateAroundObjectAxis( object, axis, radians )
-	{
-	    var rotationMatrix = new THREE.Matrix4();
-	    rotationMatrix.makeRotationAxis( axis.normalize(), radians );
-			object.applyMatrix(rotationMatrix);
-			var mp = midpoint(currentCut[0], currentCut[1]);
-			var dis = distanceVector(new THREE.Vector3(), mp);
-			var multiple = ((mp.x <= 0 && mp.y <= 0)) ? -1 : 1;
-			object.position.setZ(multiple * Math.sin(radians) * dis);
-			object.position.setY(mp.y - Math.cos(radians) * mp.y);
-			object.position.setX(mp.x - Math.cos(radians) * mp.x);
-	};
+	// function rotateAroundObjectAxis( object, axis, radians )
+	// {
+	//     var rotationMatrix = new THREE.Matrix4();
+	//     rotationMatrix.makeRotationAxis( axis.normalize(), radians );
+	// 		object.applyMatrix(rotationMatrix);
+	// 		var mp = midpoint(currentCut[0], currentCut[1]);
+	// 		var dis = distanceVector(new THREE.Vector3(), mp);
+	// 		var multiple = ((mp.x <= 0 && mp.y <= 0)) ? -1 : 1;
+	// 		object.position.setZ(multiple * Math.sin(radians) * dis);
+	// 		object.position.setY(mp.y - Math.cos(radians) * mp.y);
+	// 		object.position.setX(mp.x - Math.cos(radians) * mp.x);
+	// };
+	// function midpoint(v1, v2)
+	// {
+	// 	return new THREE.Vector3((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
+	// }
+	// function distanceVector( v1, v2 )
+	// {
+	//     var dx = v1.x - v2.x;
+	//     var dy = v1.y - v2.y;
+	//     var dz = v1.z - v2.z;
+	//
+	//     return Math.sqrt( dx * dx + dy * dy + dz * dz );
+	// };
 
-	function midpoint(v1, v2)
-	{
-		return new THREE.Vector3((v1.x + v2.x)/2, (v1.y + v2.y)/2, (v1.z + v2.z)/2);
-	}
-
-	function distanceVector( v1, v2 )
-	{
-	    var dx = v1.x - v2.x;
-	    var dy = v1.y - v2.y;
-	    var dz = v1.z - v2.z;
-
-	    return Math.sqrt( dx * dx + dy * dy + dz * dz );
-	};
 
 	function distance2D (x1, y1, x2, y2)
 	{
@@ -579,7 +593,7 @@
 		return result;
 	}
 
-	function getMeta(url){   
+	function getMeta(url){
 	    var img = new Image();
 	    img.onload = function(){
 	        alert( this.width+' '+ this.height );
@@ -616,4 +630,4 @@
 	</script>
 
 	</body>
-	</html>
+</html>
