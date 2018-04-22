@@ -263,6 +263,7 @@
 
 		if (cutMode)
 		{
+
 			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
@@ -290,6 +291,7 @@
 				pastLineSegments.push(linePoints);
 				console.log("Past line Segs", pastLineSegments);
 				linePoints = [];
+				result = [];
 			}
 		}
 		if (selectMode)
@@ -311,6 +313,7 @@
 				console.log("object selected");
 
 			}
+			linePoints = [];
 		}
 		rotateOn = false;
 	};
@@ -352,7 +355,7 @@
 	};
 
 	//https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
-	// Check weather a new cut intersects an old cut
+	// Check wether a new cut intersects an old cut
 	function isIntersecting(p1, p2, p3, p4) {
 		function CCW(p1, p2, p3) {
 				return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
