@@ -54,6 +54,7 @@
 	var foldDragDistance = 0; //sum of fold drag distances
 	var gui;
 	var cutcount = 0;
+	var imageurl = 'fbox.png';;
 
 	// FUNCTIONS
 	function main()
@@ -121,7 +122,6 @@
 			}
 		}
 
-		var imageurl = 'fbox.png';
 		if (document.getElementById("userImage").value) {
 			imageurl = document.getElementById("userImage").value;
 			imageurl = imageurl.split("\\")[2];
@@ -614,6 +614,7 @@
 				// ]);
 
 			} else if (situation > 3) {
+				//plane 1 definition
 				plane1.vertices.push(v1);
 				plane1.vertices.push(v2);
 				plane1.vertices.push(v3);
@@ -621,20 +622,45 @@
 				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
 				plane1.faces.push( new THREE.Face3( 2, 3, 0 ) );
 
+				//image map for plane 1
+				var uv1x = (v1.x + (imageWidth / 2)) / (imageWidth);
+				var uv1y = (v1.y + (imageHeight / 2)) / (imageHeight);
+				var uv1 = new THREE.Vector2(uv1x, uv1y);
+				var uv2x = (v2.x + (imageWidth / 2)) / (imageWidth);
+				var uv2y = (v2.y + (imageHeight / 2)) / (imageHeight);
+				var uv2 = new THREE.Vector2(uv2x, uv2y);
+				var uv3x = (v3.x + (imageWidth / 2)) / (imageWidth);
+				var uv3y = (v3.y + (imageHeight / 2)) / (imageHeight);
+				var uv3 = new THREE.Vector2(uv3x, uv3y);
+				var uv4x = (v4.x + (imageWidth / 2)) / (imageWidth);
+				var uv4y = (v4.y + (imageHeight / 2)) / (imageHeight);
+				var uv4 = new THREE.Vector2(uv4x, uv4y);
+
+				plane1.faceVertexUvs[0][0] = [ uv1, uv2, uv3 ];
+				plane1.faceVertexUvs[0][1] = [ uv3, uv4, uv1 ];
+
+				plane1.uvsNeedUpdate = true;
+
 				plane2.vertices.push(w1);
 				plane2.vertices.push(w2);
 				plane2.vertices.push(w3);
 				plane2.vertices.push(w4);
 				plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
 				plane2.faces.push( new THREE.Face3( 2, 3, 0 ) );
+
 			}
 			var color = Math.random() * 0xffffff;
 			var material1 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
+			uploadedImage.needsUpdate = true;
+
 			var mesh = new THREE.Mesh( plane1, material1 );
+
+			console.log(plane1);
+
 			scene.add(mesh);
 			objects.push(mesh);
 
-			var material2 = new THREE.MeshBasicMaterial({color : color, side: THREE.DoubleSide});
+			var material2 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
 
 			if (situation < 4) {
 
