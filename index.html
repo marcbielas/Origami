@@ -159,7 +159,7 @@
 		ImageMaterial.map.needsUpdate = true;
 		//var ImageMaterial = new THREE.MeshBasicMaterial({map : image, side: THREE.DoubleSide});//
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
-		console.log(mesh);
+		//console.log(mesh);
 		// mesh.position.set(0,100,0);
 		scene.add( mesh );
 		objects.push(mesh);
@@ -425,8 +425,6 @@
 		//coordinate automation
 		var plane1 = new THREE.Geometry();
 		var plane2 = new THREE.Geometry();
-
-		console.log(mesh.geometry.vertices);
 		
 		if (vertices.length == 3) {
 			if (situation == 6) {
@@ -494,11 +492,17 @@
 
 			scene.add(mesh2);
 			objects.push(mesh2);
-			console.log(objects);
 			selectedToRotate = objects[cutcount];
 			cutcount += 1;
 
 		} else if (vertices.length == 4) {
+
+			if (vertices[2].x > vertices[3].x) {
+				var temp = mesh.geometry.vertices[3];
+				vertices[3] = mesh.geometry.vertices[2];
+				vertices[2]= temp;
+			}
+
 			//top left corner
 			if (situation == 0) {
 				var v1 = new THREE.Vector3(pt1.x, pt1.y);
@@ -653,10 +657,6 @@
 			objects.push(mesh2);
 			selectedToRotate = objects[cutcount];
 			cutcount += 1;
-
-			console.log("output");
-			console.log(mesh.geometry.vertices);
-			console.log(mesh2.geometry.vertices);
 
 		} else if (vertices.length == 5) {
 			//creates 5-4 or 6-3 shapes
@@ -885,8 +885,6 @@
 			// var x_a = Math.round((topright.y - pt1.y)/slope + pt1.x);
 			// var x_b = Math.round((bottomright.y - pt1.y)/slope + pt1.x);
 
-			//
-			console.log(c1,c2,c3,c4);
 
 			//find possible points
 			var posPts = [];
@@ -894,8 +892,6 @@
 			posPts.push(lineIntersection(pt1, pt2, c2, c3));
 			posPts.push(lineIntersection(pt1, pt2, c3, c4));
 			posPts.push(lineIntersection(pt1, pt2, c1, c4));
-
-			console.log(posPts);
 
 			//check if within square (max, min xy vals)
 			for (var i = 0; i < posPts.length ; i++) {
@@ -905,8 +901,6 @@
 					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
 				}
 			}
-
-			console.log(newPts);
 
 			if (newPts.length != 2) {
 				alert("ERROR");
@@ -932,26 +926,19 @@
 					left = 1;
 				}
 			}
-			console.log(left, right, top, bottom);
 
 			if (top + left == 2) {
 				situation = 0;
-				console.log("top left");
 			} else if (top + right == 2) {
 				situation = 1;
-				console.log("top right");
 			} else if (right + bottom == 2) {
 				situation = 2;
-				console.log("bottom right");
 			} else if (bottom + left == 2) {
 				situation = 3;
-				console.log("bottom left");
 			} else if (top + bottom == 2) {
 				situation = 4;
-				console.log("top bottom");
 			} else if (left + right == 2) {
 				situation = 5;
-				console.log("right left");
 			}
 			result = [newPts, situation]
 		//five point shape
