@@ -306,7 +306,7 @@
 				intersects[ 0 ].object.material.color.setHex(0xffffff);
 				selectedToRotate = intersects[ 0 ].object;
 				console.log("object selected");
-				console.log(selectedToRotate);
+				//console.log(selectedToRotate);
 
 			}
 			linePoints = [];
@@ -498,9 +498,7 @@
 			selectedToRotate = objects[cutcount];
 			cutcount += 1;
 
-		}
-
-		if (vertices.length == 4) {
+		} else if (vertices.length == 4) {
 			//top left corner
 			if (situation == 0) {
 				var v1 = new THREE.Vector3(pt1.x, pt1.y);
@@ -636,6 +634,136 @@
 			objects.push(mesh2);
 			selectedToRotate = objects[cutcount];
 			cutcount += 1;
+		} else if (vertices.length == 5) {
+			//creates 5-4 or 6-3 shapes
+
+			//top left corner
+			if (situation == 10) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(pt2.x , pt2.y);
+				var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+
+				var w1 = new THREE.Vector3(pt1.x, pt1.y);
+				var w2 = new THREE.Vector3(pt2.x , pt2.y);
+				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+				var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+				var w5 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+			//top right corner
+			} else if (situation == 11) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(pt2.x , pt2.y);
+				var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+
+				var w1 = new THREE.Vector3(pt1.x, pt1.y);
+				var w2 = new THREE.Vector3(pt2.x , pt2.y);
+				var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+				var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+				var w5 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+			//bottom right corner
+			} else if (situation == 12) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(pt2.x , pt2.y);
+				var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+
+				var w1 = new THREE.Vector3(pt1.x, pt1.y);
+				var w2 = new THREE.Vector3(pt2.x , pt2.y);
+				var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+				var w5 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+			//bottom left corner
+			} else if (situation == 13) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(pt2.x , pt2.y);
+				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+
+				var w1 = new THREE.Vector3(pt2.x , pt2.y);
+				var w2 = new THREE.Vector3(pt1.x, pt1.y);
+				var w3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+				var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+				var w5 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+			//top bottom cut
+			} else if (situation == 14) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+				var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+				var v4 = new THREE.Vector3(pt2.x , pt2.y);
+
+				var w1 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+				var w2 = new THREE.Vector3(pt1.x, pt1.y);
+				var w3 = new THREE.Vector3(pt2.x , pt2.y);
+				var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+			//left right cut
+			}
+			else if (situation == 15) {
+				var v1 = new THREE.Vector3(pt1.x, pt1.y);
+				var v2 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+				var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+				var v4 = new THREE.Vector3(pt2.x , pt2.y);
+
+				var w1 = new THREE.Vector3(pt1.x, pt1.y);
+				var w2 = new THREE.Vector3(pt2.x , pt2.y);
+				var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+				var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+
+			}
+			//for 3-1 divisions
+			if (situation < 14) {
+				plane1.vertices.push(v1);
+				plane1.vertices.push(v2);
+				plane1.vertices.push(v3);
+				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+				plane2.vertices.push(w1);
+				plane2.vertices.push(w2);
+				plane2.vertices.push(w3);
+				plane2.vertices.push(w4);
+				plane2.vertices.push(w5);
+
+			} else if (situation > 13) {
+				plane1.vertices.push(v1);
+				plane1.vertices.push(v2);
+				plane1.vertices.push(v3);
+				plane1.vertices.push(v4);
+				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
+				plane1.faces.push( new THREE.Face3( 2, 3, 0 ) );
+
+				plane2.vertices.push(w1);
+				plane2.vertices.push(w2);
+				plane2.vertices.push(w3);
+				plane2.vertices.push(w4);
+				plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
+				plane2.faces.push( new THREE.Face3( 2, 3, 0 ) );
+			}
+
+			var material1 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
+			var mesh = new THREE.Mesh( plane1, material1 );
+			scene.add(mesh);
+			objects.push(mesh);
+
+			var material2 = new THREE.MeshBasicMaterial({color : 0x0000ff, side: THREE.DoubleSide});
+
+			if (situation < 4) {
+
+				var vertices = plane2.vertices;
+				var holes = [];
+				var triangles, mesh;
+				var geometry = new THREE.Geometry();
+
+				geometry.vertices = vertices;
+				triangles = THREE.ShapeUtils.triangulateShape( vertices, holes );
+
+				for( var i = 0; i < triangles.length; i++ ){
+			    	geometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
+				}
+				mesh2 = new THREE.Mesh( geometry, material2 );
+			} else {
+				mesh2 = new THREE.Mesh( plane2, material2 );
+			}
+
+			scene.add(mesh2);
+			objects.push(mesh2);
+			selectedToRotate = objects[cutcount];
+			cutcount += 1;
 		}
 		
 	}
@@ -665,7 +793,7 @@
 			posPts.push(lineIntersection(pt1, pt2, c3, c2));
 			posPts.push(lineIntersection(pt1, pt2, c1, c3));
 
-			console.log(newPts);
+			//console.log(newPts);
 
 			var flag1 = flag2 = flag3 = false;
 
@@ -761,6 +889,74 @@
 				situation = 5;
 			}
 			result = [newPts, situation]
+		//five point shape
+		} else if (mesh.geometry.vertices.length == 5) {
+			var c1 = mesh.geometry.vertices[0];
+			var c2 = mesh.geometry.vertices[1];
+			var c3 = mesh.geometry.vertices[2];
+			var c4 = mesh.geometry.vertices[3];
+			var c5 = mesh.geometry.vertices[4];
+
+			//find possible points
+			var posPts = [];
+			posPts.push(lineIntersection(pt1, pt2, c1, c2));
+			posPts.push(lineIntersection(pt1, pt2, c2, c3));
+			posPts.push(lineIntersection(pt1, pt2, c3, c4));
+			posPts.push(lineIntersection(pt1, pt2, c4, c5));
+			posPts.push(lineIntersection(pt1, pt2, c5, c1));
+
+			// console.log(posPts);
+			
+			//check if within square (max, min xy vals)
+			for (var i = 0; i < posPts.length ; i++) {
+				var pos1 = Math.abs(posPts[i][0]);
+				var pos2 = Math.abs(posPts[i][1]);
+				if (!( (pos1 > (imageWidth/2))|| (pos2 > (imageHeight/2)) )) {
+					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
+				}
+			}
+
+			// console.log(newPts);
+
+			if (newPts.length != 2) {
+				alert("ERROR");
+			}
+
+			//point is on left
+			for (var i = 0; i < 2; i++) {
+				if(newPts[i].y <= -(imageHeight / 2)) {
+					left = 1;
+				}
+				//point is on top
+				if(newPts[i].x <= imageWidth/2) {
+					top = 1;
+				}
+				//point is on right
+				if(newPts[i].y <= imageHeight / 2) {
+					right = 1;
+				}
+				//point is on bottom
+				if(newPts[i].x <= -(imageWidth/2)) {
+					bottom = 1;
+				}
+			}
+			
+			
+			if (top + left == 2) {
+				situation = 10;
+			} else if (top + right == 2) {
+				situation = 11;
+			} else if (right + bottom == 2) {
+				situation = 12;
+			} else if (bottom + left == 2) {
+				situation = 13;
+			} else if (top + bottom == 2) {
+				situation = 14;
+			} else if (left + right == 2) {
+				situation = 15;
+			}
+
+			result = [newPts, situation];
 		}
 		return result;
 	}
