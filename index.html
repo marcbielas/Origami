@@ -53,6 +53,7 @@
 	var size;
 	var foldDragDistance = 0; //sum of fold drag distances
 	var gui;
+	var cutcount = 0;
 
 	// FUNCTIONS
 	function main()
@@ -222,7 +223,6 @@
 
 	 	// Make the sphere follow the mouse
 		mouseMesh.position.copy(get3dPointZAxis());
-
 		if (rotateMode && rotateOn)
 		{
 			controls.enabled = false;
@@ -262,7 +262,7 @@
 		}
 
 		if (cutMode)
-		{
+		{	
 
 			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
@@ -285,7 +285,6 @@
 				var c2 = new THREE.Vector3(linePoints[1].x, linePoints[1].y, linePoints[1].z);
 				currentCut = [c1,c2];
 				pastLineSegments.push(linePoints);
-				console.log("Past line Segs", pastLineSegments);
 				linePoints = [];
 				result = [];
 			}
@@ -302,7 +301,7 @@
 			{
 				if(selectedToRotate) {
 					//highlight
-					selectedToRotate.material.color.setHex(0x0000ff);
+					selectedToRotate.material.color.setHex(0xffffff);
 				}
 				intersects[ 0 ].object.material.color.setHex(0xffffff);
 				selectedToRotate = intersects[ 0 ].object;
@@ -412,12 +411,22 @@
 	{
 		var vertices = mesh.geometry.vertices;
 		scene.remove(mesh);
-		objects.pop();
+
+		var temp = [];
+
+		for (var i = 0; i < objects.length; i++) {
+			if (objects[i].geometry.vertices != vertices) 
+			{
+				temp.push(objects[i]);
+			}
+		}
+		objects = temp;
+
 		//coordinate automation
 		var plane1 = new THREE.Geometry();
 		var plane2 = new THREE.Geometry();
 
-		console.log(mesh.geometry);
+		console.log(mesh.geometry.vertices);
 		
 		if (vertices.length == 3) {
 			if (situation == 6) {
@@ -472,18 +481,22 @@
 			plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
 			plane2.faces.push( new THREE.Face3( 2, 1, 3 ) );
 
+			var color = Math.random() * 0xffffff;
+
 			var material1 = new THREE.MeshBasicMaterial({color : 0xff00ff, side: THREE.DoubleSide});
 			var mesh = new THREE.Mesh( plane1, material1 );
 			scene.add(mesh);
 			objects.push(mesh);
 
-			var material2 = new THREE.MeshBasicMaterial({color : 0xffffff, side: THREE.DoubleSide});
+			var material2 = new THREE.MeshBasicMaterial({color : color, side: THREE.DoubleSide});
 
 			mesh2 = new THREE.Mesh( plane2, material2 );
 
 			scene.add(mesh2);
 			objects.push(mesh2);
-			selectedToRotate = objects[0];
+			console.log(objects);
+			selectedToRotate = objects[cutcount];
+			cutcount += 1;
 
 		}
 
@@ -621,7 +634,8 @@
 
 			scene.add(mesh2);
 			objects.push(mesh2);
-			selectedToRotate = objects[0];
+			selectedToRotate = objects[cutcount];
+			cutcount += 1;
 		}
 		
 	}
