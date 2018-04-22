@@ -599,19 +599,25 @@
 				plane1.vertices.push(v3);
 				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
 
+				plane1.faceVertexUvs[0][0] = uvmap(v1,v2,v3);
+
+				plane1.uvsNeedUpdate = true;
+
 				plane2.vertices.push(w1);
 				plane2.vertices.push(w2);
 				plane2.vertices.push(w3);
 				plane2.vertices.push(w4);
 				plane2.vertices.push(w5);
-	//
-				// console.log("UV");
-				// plane2.faceVertexUvs[0].push([
-				//   new THREE.UVMapping(0, 1),
-				//   new THREE.UVMapping(1, 1),
-				//   new THREE.UVMapping(1, 0),
-				//   new THREE.UVMapping(0, 0)
-				// ]);
+
+				console.log(w1, w2, w3, w4, w5);
+				console.log(plane2.faceVertexUvs);
+				plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w3);
+				plane2.faceVertexUvs[0][1] = uvmap(w4,w3,w5);
+				plane2.faceVertexUvs[0][2] = uvmap(w5,w4,w1);
+				// plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w5);
+				// plane2.faceVertexUvs[0][1] = uvmap(w2,w3,w5);
+				// plane2.faceVertexUvs[0][2] = uvmap(w3,w4,w5);
+				plane2.uvsNeedUpdate = true;
 
 			} else if (situation > 3) {
 				//plane 1 definition
@@ -622,23 +628,8 @@
 				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
 				plane1.faces.push( new THREE.Face3( 2, 3, 0 ) );
 
-				//image map for plane 1
-				var uv1x = (v1.x + (imageWidth / 2)) / (imageWidth);
-				var uv1y = (v1.y + (imageHeight / 2)) / (imageHeight);
-				var uv1 = new THREE.Vector2(uv1x, uv1y);
-				var uv2x = (v2.x + (imageWidth / 2)) / (imageWidth);
-				var uv2y = (v2.y + (imageHeight / 2)) / (imageHeight);
-				var uv2 = new THREE.Vector2(uv2x, uv2y);
-				var uv3x = (v3.x + (imageWidth / 2)) / (imageWidth);
-				var uv3y = (v3.y + (imageHeight / 2)) / (imageHeight);
-				var uv3 = new THREE.Vector2(uv3x, uv3y);
-				var uv4x = (v4.x + (imageWidth / 2)) / (imageWidth);
-				var uv4y = (v4.y + (imageHeight / 2)) / (imageHeight);
-				var uv4 = new THREE.Vector2(uv4x, uv4y);
-
-				plane1.faceVertexUvs[0][0] = [ uv1, uv2, uv3 ];
-				plane1.faceVertexUvs[0][1] = [ uv3, uv4, uv1 ];
-
+				plane1.faceVertexUvs[0][0] = uvmap(v1,v2,v3);
+				plane1.faceVertexUvs[0][1] = uvmap(v3,v4,v1);
 				plane1.uvsNeedUpdate = true;
 
 				plane2.vertices.push(w1);
@@ -648,14 +639,16 @@
 				plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
 				plane2.faces.push( new THREE.Face3( 2, 3, 0 ) );
 
+				plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w3);
+				plane2.faceVertexUvs[0][1] = uvmap(w3,w4,w1);
+				plane2.uvsNeedUpdate = true;
+
 			}
 			var color = Math.random() * 0xffffff;
 			var material1 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
 			uploadedImage.needsUpdate = true;
 
 			var mesh = new THREE.Mesh( plane1, material1 );
-
-			console.log(plane1);
 
 			scene.add(mesh);
 			objects.push(mesh);
@@ -675,6 +668,22 @@
 				for( var i = 0; i < triangles.length; i++ ){
 			    	geometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
 				}
+
+				if (situation == 3 || situation == 0) {
+					console.log(geometry.vertices);
+					test = uvmap(w3,w4,w1);
+					geometry.faceVertexUvs[0][0] = uvmap(w4,w5,w1);
+					geometry.faceVertexUvs[0][1] = uvmap(w1,w2,w3);
+					geometry.faceVertexUvs[0][2] = uvmap(w3,w4,w1);
+					console.log(geometry.faceVertexUvs);
+				} else {
+					geometry.faceVertexUvs[0][0] = uvmap(w2,w1,w5);
+					geometry.faceVertexUvs[0][1] = uvmap(w5,w4,w3);
+					geometry.faceVertexUvs[0][2] = uvmap(w3,w2,w5);
+				}
+				
+				geometry.uvsNeedUpdate = true;
+
 				mesh2 = new THREE.Mesh( geometry, material2 );
 			} else {
 				mesh2 = new THREE.Mesh( plane2, material2 );
@@ -1081,6 +1090,21 @@
 		return result;
 	}
 
+	function uvmap(v1, v2, v3) {
+		//image map for single face
+		var uv1x = (v1.x + (imageWidth / 2)) / (imageWidth);
+		var uv1y = (v1.y + (imageHeight / 2)) / (imageHeight);
+		var uv1 = new THREE.Vector2(uv1x, uv1y);
+		var uv2x = (v2.x + (imageWidth / 2)) / (imageWidth);
+		var uv2y = (v2.y + (imageHeight / 2)) / (imageHeight);
+		var uv2 = new THREE.Vector2(uv2x, uv2y);
+		var uv3x = (v3.x + (imageWidth / 2)) / (imageWidth);
+		var uv3y = (v3.y + (imageHeight / 2)) / (imageHeight);
+		var uv3 = new THREE.Vector2(uv3x, uv3y);
+
+		var result = [uv1, uv2, uv3];
+		return result;
+	}
 
 	function animate()
 	{
