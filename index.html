@@ -116,7 +116,7 @@
 		d2 = document.getElementById("d2").value;
 		if (d1 && d2) {
 			if (d1 > d2) {
-			imageHeight = 500 * (d1 / d2);
+				imageHeight = 500 * (d1 / d2);
 			} else {
 				imageWidth = 500 * (d2 / d1);
 			}
@@ -572,24 +572,29 @@
 			//left right cut
 			}
 			else if (situation == 5) {
-				// var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				// var v2 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				// var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				// var v4 = new THREE.Vector3(pt2.x , pt2.y);
 
-				// var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				// var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				// var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				// var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				var v4 = new THREE.Vector3(pt2.x , pt2.y);
+				if (vertices[3].y == -250) {
+					var v1 = new THREE.Vector3(pt1.x, pt1.y);
+					var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+					var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+					var v4 = new THREE.Vector3(pt2.x , pt2.y);
 
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+					var w1 = new THREE.Vector3(pt1.x, pt1.y);
+					var w2 = new THREE.Vector3(pt2.x , pt2.y);
+					var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+					var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
+				} else {
+					//weird case
+					var v1 = new THREE.Vector3(vertices[3].x, vertices[3].y);//
+					var v2 = new THREE.Vector3(vertices[0].x, vertices[0].y);
+					var v3 = new THREE.Vector3(pt1.x, pt1.y);
+					var v4 = new THREE.Vector3(pt2.x , pt2.y);
+
+					var w1 = new THREE.Vector3(pt1.x, pt1.y);
+					var w2 = new THREE.Vector3(pt2.x , pt2.y);
+					var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
+					var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
+				}
 
 			}
 			//for 3-1 divisions
@@ -862,7 +867,11 @@
 			for (var i = 0; i < posPts.length ; i++) {
 				var pos1 = Math.abs(posPts[i][0]);
 				var pos2 = Math.abs(posPts[i][1]);
-				if (!( (pos1 > (imageWidth/2))|| (pos2 > (imageHeight/2)) )) {
+				var imwh = imageWidth / 2;
+				console.log(imwh);
+				var imhh = imageHeight / 2;
+				console.log(imhh);
+				if (!( (pos1 > imwh)|| (pos2 > imhh ))) {
 					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
 				}
 			}
@@ -933,13 +942,14 @@
 			for (var i = 0; i < posPts.length ; i++) {
 				var pos1 = Math.abs(posPts[i][0]);
 				var pos2 = Math.abs(posPts[i][1]);
-				if (!( (pos1 > (imageWidth/2))|| (pos2 > (imageHeight/2)) )) {
+				console.log(pos1, pos2);
+				if ((!( (pos1 > (imageWidth/2)) || (pos2 > (imageHeight/2)) )) && ((pos1 == (imageWidth/2)) || (pos2 == (imageHeight/2)))) {
 					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
 				}
 			}
 
 			if (newPts.length != 2) {
-				alert("ERROR");
+				console.log("length not 2");
 			}
 			//
 
