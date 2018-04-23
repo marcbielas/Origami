@@ -15,11 +15,17 @@
 	<script src="js/THREEx.WindowResize.js"></script>
 	<script type='text/javascript' src='js/dat.gui.min.js'></script>
 
-	<p>Upload an Image</p>
+	<b>Welcome to Origami!</b>
+	<p>Origami is an online interface for flat image folding in 3d space. </p>
+	<p>You can use select ('s'), cut ('c'), and fold ('f') tools to manipulate. </p>
+	<p>Created by M. Bielas and D. Gorodezky, Yale Spring 2018</p>
+	<br></br>
+	<p>Upload an Image (optional)</p>
 	<input id="userImage" type="file">
-	<p>Image Dimensions</p>
-	<input id="d1" type="text"> <input id="d2" type="text">
-	<p> Start <input id="someInput" type="button" onClick="main()"></p>
+	<p>Image Dimensions (optional)</p>
+	<input id="d1" type="text" placeholder="length"> <input id="d2" type="text" placeholder="width">
+	<br></br>
+	<b> Start <input id="someInput" type="button" onClick="main()"></b>
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
