@@ -203,7 +203,7 @@
 	function setMode()
 	{
 		var value = parameters.mode;
-		if (value == "Cutting")
+		if (value == "Selecting")
 		{
 			cutMode=true;
 			selectMode = rotateMode = false;
@@ -269,7 +269,7 @@
 		}
 
 		if (cutMode)
-		{	
+		{
 
 			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
@@ -308,12 +308,13 @@
 			{
 				if(selectedToRotate) {
 					//highlight
-					selectedToRotate.material.color.setHex(0xffffff);
+					selectedToRotate.material.opacity = 1;
 				}
-				intersects[ 0 ].object.material.color.setHex(0xffffff);
+				intersects[ 0 ].object.material.opacity = 0.7;
+				intersects[ 0 ].object.material.transparent = true;
 				selectedToRotate = intersects[ 0 ].object;
 				console.log("object selected");
-				//console.log(selectedToRotate);
+				console.log(selectedToRotate);
 
 			}
 			linePoints = [];
@@ -422,7 +423,7 @@
 		var temp = [];
 
 		for (var i = 0; i < objects.length; i++) {
-			if (objects[i].geometry.vertices != vertices) 
+			if (objects[i].geometry.vertices != vertices)
 			{
 				temp.push(objects[i]);
 			}
@@ -432,7 +433,7 @@
 		//coordinate automation
 		var plane1 = new THREE.Geometry();
 		var plane2 = new THREE.Geometry();
-		
+
 		if (vertices.length == 3) {
 			if (situation == 6) {
 				var v1 = new THREE.Vector3(pt1.x, pt1.y);
@@ -471,7 +472,7 @@
 				var w2 = new THREE.Vector3(pt2.x , pt2.y);
 				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
 				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				
+
 			}
 
 			plane1.vertices.push(v1);
@@ -692,7 +693,7 @@
 					geometry.faceVertexUvs[0][1] = uvmap(w5,w4,w3);
 					geometry.faceVertexUvs[0][2] = uvmap(w3,w2,w5);
 				}
-				
+
 				geometry.uvsNeedUpdate = true;
 
 				mesh2 = new THREE.Mesh( geometry, material2 );
@@ -837,7 +838,7 @@
 			selectedToRotate = objects[cutcount];
 			cutcount += 1;
 		}
-		
+
 	}
 
 	function extrapolatePoints(mesh, pt1, pt2) {
@@ -904,8 +905,8 @@
 					bottom = 1;
 				}
 			}
-			
-			
+
+
 			if (top + left == 2) {
 				situation = 6;
 			} else if (top + right == 2) {
@@ -917,7 +918,7 @@
 			}
 
 			result = [newPts, situation];
-		
+
 		//4 base rectangle
 		} else if (mesh.geometry.vertices.length == 4) {
 			var c1 = mesh.geometry.vertices[0];
@@ -959,7 +960,7 @@
 			}
 			//
 
-			
+
 			//point is on bottom
 			for (var i = 0; i < 2; i++) {
 				if(newPts[i].y == -(imageHeight / 2)) {
@@ -1010,7 +1011,7 @@
 			posPts.push(lineIntersection(pt1, pt2, c5, c1));
 
 			// console.log(posPts);
-			
+
 			//check if within square (max, min xy vals)
 			for (var i = 0; i < posPts.length ; i++) {
 				var pos1 = Math.abs(posPts[i][0]);
@@ -1044,8 +1045,8 @@
 					bottom = 1;
 				}
 			}
-			
-			
+
+
 			if (top + left == 2) {
 				situation = 10;
 			} else if (top + right == 2) {
