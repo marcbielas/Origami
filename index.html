@@ -29,9 +29,7 @@
 
 	<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
 	<script>
-
 	//THREEjs template from Lee Stemkoski
-
 	// MAIN
 	// standard global variables
 	var container, scene, camera, renderer, controls;
@@ -59,14 +57,12 @@
 	var size;
 	var gui;
 	var imageurl = 'fbox.png';
-
 	// FUNCTIONS
 	function main()
 	{
 		init();
 		animate();
 	}
-
 	function init()
 	{
 		// SCENE
@@ -91,19 +87,15 @@
 		THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
 		// CONTROLS
 		controls = new THREE.OrbitControls( camera, renderer.domElement );
-
 		// LIGHT
 		var light = new THREE.PointLight(0xffffff);
 		light.position.set(100,250,100);
 		scene.add(light);
-
 		// SKYBOX
 		var skyBoxGeometry = new THREE.CubeGeometry( 10000, 10000, 10000 );
 		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
-
 		scene.add(skyBox);
-
 		var d1 = d2 = 1;
 		d1 = document.getElementById("d1").value;
 		d2 = document.getElementById("d2").value;
@@ -114,16 +106,13 @@
 				imageWidth = 500 * (d2 / d1);
 			}
 		}
-
 		// var geometry = new THREE.SphereGeometry( 30, 32, 16 );
 		// var material = new THREE.MeshLambertMaterial( { color: 0x000088 } );
 		// mesh = new THREE.Mesh( geometry, material );
 		// mesh.position.set(0,40,0);
 		// scene.add(mesh);
-
 		// UPLOAD IMAGE
 		 //var imageurl = 'fbox.png';
-
 		 //dimension adaptation
 		var d1 = d2 = 1;
 		d1 = document.getElementById("d1").value;
@@ -135,16 +124,12 @@
 				imageWidth = 500 * (d2 / d1);
 			}
 		}
-
 		var imageurl = 'fbox.png';
 		if (document.getElementById("userImage").value) {
 			imageurl = document.getElementById("userImage").value;
 			imageurl = imageurl.split("\\")[2];
 		}
-
-
 		// var img= new Image();
-
 		// var imwidth;
 		// var imheight;
 		// img.onload = function(){
@@ -155,20 +140,14 @@
   //   	};
   //   	img.src = imageurl;
   		// getMeta(imageurl);
-
   		// imwidth = size.w;
   		// imheight = size.h;
-
     // 	alert('3 '+imwidth+' '+imheight);
-
-
 		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 1, 1);
 		uploadedImage = new THREE.TextureLoader().load(imageurl);
-
 		// alert('4 '+imwidth+' '+imheight);
 		// console.log(imwidth);
   //   	console.log(imheight);
-
 		//var texture = new THREE.CanvasTexture('js/rocks.jpg');
 		//var ImageMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
 		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//({color: 0xffff00});
@@ -181,7 +160,6 @@
 		objects.push(mesh);
 		selectedToRotate = objects[0];
 		scene.updateMatrixWorld(true);
-
 		// Create a circle around the mouse and move it
 		// The sphere has opacity 0
 		var mouseGeometry = 	new THREE.SphereGeometry( 10, 32, 32 );
@@ -189,7 +167,6 @@
 		mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
 		mouseMesh.position.z = -5;
 		scene.add(mouseMesh);
-
 		// GUI implementation
 	    gui = new dat.GUI();
 		parameters =
@@ -200,19 +177,17 @@
 		selectedMode.onChange(function(value)
 		{  setMode(); });
 		gui.open();
-
 		// When the mouse moves, call the given function
 		document.addEventListener('mousemove', onMouseMove, false);
 		document.addEventListener('mousedown', onMouseDown, false);
 		document.addEventListener('mouseup', onMouseUp, false);
 		document.addEventListener("keydown", onDocumentKeyDown, false);
 	}
-
 	// Set User Input Mode
 	function setMode()
 	{
 		var value = parameters.mode;
-		if (value == "Selecting")
+		if (value == "Cutting")
 		{
 			cutMode=true;
 			selectMode = rotateMode = false;
@@ -228,19 +203,16 @@
 			cutMode = selectMode = false;
 		}
 	}
-
 	// Follows the mouse event
 	function onMouseMove(event) {
-
 		// Update the mouse variable
 		event.preventDefault();
 		mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
 		mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-
 	 	// Make the sphere follow the mouse
 		mouseMesh.position.copy(get3dPointZAxis());
 		if (rotateMode && rotateOn)
-		{	
+		{
 			var currentCut = objectCuts[selectedToRotate.uuid];
 			controls.enabled = false;
 			if(!currentCut || currentCut.length < 2 || !selectedToRotate) return;
@@ -257,7 +229,6 @@
 		}
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
-
 	function updateCurRotation() {
 		var sign = 1;
 		if (coordsOnDown[0] > mouse.x) {
@@ -265,7 +236,6 @@
 		}
 		return sign * Math.PI * distance2D(coordsOnDown[0], coordsOnDown[1], mouse.x, mouse.y);
 	};
-
 	function onMouseDown(event) {
 		coordsOnDown = [mouse.x, mouse.y];
 		rotateOn = true;
@@ -279,10 +249,8 @@
 				objectRotations[selectedToRotate.uuid][1] += updateCurRotation();
 			return;
 		}
-
 		if (cutMode)
 		{
-
 			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
@@ -320,26 +288,14 @@
 			var intersects = raycaster.intersectObjects( objects );
 			if ( intersects.length > 0 )
 			{
-<<<<<<< HEAD
-				if(selectedToRotate) {
-					//highlight
-					selectedToRotate.material.opacity = 1;
-				}
-				intersects[ 0 ].object.material.opacity = 0.7;
-				intersects[ 0 ].object.material.transparent = true;
-				selectedToRotate = intersects[ 0 ].object;
-=======
 				selectObject(intersects[0].object);
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
 				console.log("object selected");
 				console.log(selectedToRotate);
-
 			}
 			linePoints = [];
 		}
 		rotateOn = false;
 	};
-
 	function selectObject(object) {
 		if(!object) return;
 		if(selectedToRotate) {
@@ -349,7 +305,6 @@
 		object.material.transparent = true;
 		selectedToRotate = object;
 	}
-
 	function makeGUI(initValue) {
 		// GUI implementatio
 		if(gui)
@@ -363,9 +318,7 @@
 		selectedMode.onChange(function(value)
 		{  setMode(); });
 		gui.open();
-
 	}
-
 	function onDocumentKeyDown(event) {
 		var keyCode = event.which;
 		if (selectedToRotate && keyCode == 68) {
@@ -387,8 +340,7 @@
 			var index = keyCode - 49;
 			selectObject(objects[index]);
 		}
-	}; 
-
+	};
 	//https://stackoverflow.com/questions/9043805/test-if-two-lines-intersect-javascript-function
 	// Check wether a new cut intersects an old cut
 	function isIntersecting(p1, p2, p3, p4) {
@@ -397,7 +349,6 @@
 		}
 		return (CCW(p1, p3, p4) != CCW(p2, p3, p4)) && (CCW(p1, p2, p3) != CCW(p1, p2, p4));
 	}
-
 	// Quaternion Rotation from https://stackoverflow.com/questions/31953608/rotate-object-on-specific-axis-anywhere-in-three-js-including-outside-of-mesh
 	THREE.Object3D.prototype.rotateAroundWorldAxis = function() {
     var q = new THREE.Quaternion();
@@ -410,308 +361,24 @@
         return this;
     	}
 	}();
-
 	function distance2D (x1, y1, x2, y2)
 	{
 		var dx = x1 - x2;
 		var dy = y1 - y2;
 		return Math.sqrt( dx * dx + dy * dy);
 	};
-
-<<<<<<< HEAD
-	function subdivide (mesh , pt1, pt2, situation)
-	{
-		var vertices = mesh.geometry.vertices;
-		scene.remove(mesh);
-
-		var temp = [];
-
-		for (var i = 0; i < objects.length; i++) {
-			if (objects[i].geometry.vertices != vertices)
-			{
-				temp.push(objects[i]);
-			}
-		}
-		objects = temp;
-
-		//coordinate automation
-		var plane1 = new THREE.Geometry();
-		var plane2 = new THREE.Geometry();
-
-		if (vertices.length == 3) {
-			if (situation == 6) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-			} else if (situation == 7) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-			} else if (situation == 8) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-
-			} else {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-
-			}
-
-			plane1.vertices.push(v1);
-			plane1.vertices.push(v2);
-			plane1.vertices.push(v3);
-			plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
-
-			plane2.vertices.push(w1);
-			plane2.vertices.push(w2);
-			plane2.vertices.push(w3);
-			plane2.vertices.push(w4);
-			plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
-			plane2.faces.push( new THREE.Face3( 2, 1, 3 ) );
-
-			var color = Math.random() * 0xffffff;
-
-			var material1 = new THREE.MeshBasicMaterial({color : 0xff00ff, side: THREE.DoubleSide});
-			var mesh = new THREE.Mesh( plane1, material1 );
-			scene.add(mesh);
-			objects.push(mesh);
-
-			var material2 = new THREE.MeshBasicMaterial({color : color, side: THREE.DoubleSide});
-
-			mesh2 = new THREE.Mesh( plane2, material2 );
-
-			scene.add(mesh2);
-			objects.push(mesh2);
-			selectedToRotate = objects[cutcount];
-			cutcount += 1;
-
-		} else if (vertices.length == 4) {
-
-			if (vertices[2].x > vertices[3].x) {
-				var temp = mesh.geometry.vertices[3];
-				vertices[3] = mesh.geometry.vertices[2];
-				vertices[2]= temp;
-			}
-
-			//top left corner
-			if (situation == 0) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-
-				// var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				// var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				// var w3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				// var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				// var w5 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				var w5 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-			//top right corner
-			} else if (situation == 1) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var w5 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-			//bottom right corner
-			} else if (situation == 2) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-
-				var w1 = new THREE.Vector3(pt1.x, pt1.y);
-				var w2 = new THREE.Vector3(pt2.x , pt2.y);
-				var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-				var w4 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				var w5 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-			//bottom left corner
-			} else if (situation == 3) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(pt2.x , pt2.y);
-				var v3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-
-				// var w1 = new THREE.Vector3(pt2.x , pt2.y);
-				// var w2 = new THREE.Vector3(pt1.x, pt1.y);
-				// var w3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				// var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				// var w5 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				var w1 = new THREE.Vector3(pt2.x , pt2.y);
-				var w2 = new THREE.Vector3(pt1.x, pt1.y);
-				var w3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var w5 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-			//top bottom cut
-			} else if (situation == 4) {
-				var v1 = new THREE.Vector3(pt1.x, pt1.y);
-				var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				var v3 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				var v4 = new THREE.Vector3(pt2.x , pt2.y);
-
-				var w1 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-				var w2 = new THREE.Vector3(pt1.x, pt1.y);
-				var w3 = new THREE.Vector3(pt2.x , pt2.y);
-				var w4 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-			//left right cut
-			}
-			else if (situation == 5) {
-
-				if (vertices[3].y == -250) {
-					var v1 = new THREE.Vector3(pt1.x, pt1.y);
-					var v2 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-					var v3 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-					var v4 = new THREE.Vector3(pt2.x , pt2.y);
-
-					var w1 = new THREE.Vector3(pt1.x, pt1.y);
-					var w2 = new THREE.Vector3(pt2.x , pt2.y);
-					var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-					var w4 = new THREE.Vector3(vertices[3].x, vertices[3].y);
-				} else {
-					//weird case
-					var v1 = new THREE.Vector3(vertices[3].x, vertices[3].y);//
-					var v2 = new THREE.Vector3(vertices[0].x, vertices[0].y);
-					var v3 = new THREE.Vector3(pt1.x, pt1.y);
-					var v4 = new THREE.Vector3(pt2.x , pt2.y);
-
-					var w1 = new THREE.Vector3(pt1.x, pt1.y);
-					var w2 = new THREE.Vector3(pt2.x , pt2.y);
-					var w3 = new THREE.Vector3(vertices[2].x, vertices[2].y);
-					var w4 = new THREE.Vector3(vertices[1].x, vertices[1].y);
-				}
-
-			}
-			//for 3-1 divisions
-			if (situation < 4) {
-				plane1.vertices.push(v1);
-				plane1.vertices.push(v2);
-				plane1.vertices.push(v3);
-				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
-
-				plane1.faceVertexUvs[0][0] = uvmap(v1,v2,v3);
-
-				plane1.uvsNeedUpdate = true;
-
-				plane2.vertices.push(w1);
-				plane2.vertices.push(w2);
-				plane2.vertices.push(w3);
-				plane2.vertices.push(w4);
-				plane2.vertices.push(w5);
-
-				console.log(w1, w2, w3, w4, w5);
-				console.log(plane2.faceVertexUvs);
-				plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w3);
-				plane2.faceVertexUvs[0][1] = uvmap(w4,w3,w5);
-				plane2.faceVertexUvs[0][2] = uvmap(w5,w4,w1);
-				// plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w5);
-				// plane2.faceVertexUvs[0][1] = uvmap(w2,w3,w5);
-				// plane2.faceVertexUvs[0][2] = uvmap(w3,w4,w5);
-				plane2.uvsNeedUpdate = true;
-
-			} else if (situation > 3) {
-				//plane 1 definition
-				plane1.vertices.push(v1);
-				plane1.vertices.push(v2);
-				plane1.vertices.push(v3);
-				plane1.vertices.push(v4);
-				plane1.faces.push( new THREE.Face3( 0, 1, 2 ) );
-				plane1.faces.push( new THREE.Face3( 2, 3, 0 ) );
-
-				plane1.faceVertexUvs[0][0] = uvmap(v1,v2,v3);
-				plane1.faceVertexUvs[0][1] = uvmap(v3,v4,v1);
-				plane1.uvsNeedUpdate = true;
-
-				plane2.vertices.push(w1);
-				plane2.vertices.push(w2);
-				plane2.vertices.push(w3);
-				plane2.vertices.push(w4);
-				plane2.faces.push( new THREE.Face3( 0, 1, 2 ) );
-				plane2.faces.push( new THREE.Face3( 2, 3, 0 ) );
-
-				plane2.faceVertexUvs[0][0] = uvmap(w1,w2,w3);
-				plane2.faceVertexUvs[0][1] = uvmap(w3,w4,w1);
-				plane2.uvsNeedUpdate = true;
-
-			}
-			var color = Math.random() * 0xffffff;
-			var material1 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
-			uploadedImage.needsUpdate = true;
-
-			var mesh = new THREE.Mesh( plane1, material1 );
-
-			scene.add(mesh);
-			objects.push(mesh);
-
-			var material2 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
-
-			if (situation < 4) {
-=======
 	function getCenterPoint(mesh) {
 	    var middle = new THREE.Vector3();
 	    var geometry = mesh.geometry;
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
-
 	    geometry.computeBoundingBox();
-
-<<<<<<< HEAD
-				if (situation == 3 || situation == 0) {
-					console.log(geometry.vertices);
-					test = uvmap(w3,w4,w1);
-					geometry.faceVertexUvs[0][0] = uvmap(w4,w5,w1);
-					geometry.faceVertexUvs[0][1] = uvmap(w1,w2,w3);
-					geometry.faceVertexUvs[0][2] = uvmap(w3,w4,w1);
-					console.log(geometry.faceVertexUvs);
-				} else {
-					geometry.faceVertexUvs[0][0] = uvmap(w2,w1,w5);
-					geometry.faceVertexUvs[0][1] = uvmap(w5,w4,w3);
-					geometry.faceVertexUvs[0][2] = uvmap(w3,w2,w5);
-				}
-
-				geometry.uvsNeedUpdate = true;
-
-				mesh2 = new THREE.Mesh( geometry, material2 );
-			} else {
-				mesh2 = new THREE.Mesh( plane2, material2 );
-			}
-=======
 	    middle.x = (geometry.boundingBox.max.x + geometry.boundingBox.min.x) / 2;
 	    middle.y = (geometry.boundingBox.max.y + geometry.boundingBox.min.y) / 2;
 	    middle.z = (geometry.boundingBox.max.z + geometry.boundingBox.min.z) / 2;
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
-
 	    mesh.localToWorld( middle );
 	    return middle;
 	}
-
 	function sortVertices(a, b, center)
-	{	
+	{
 	    if (a.x - center.x >= 0 && b.x - center.x < 0)
 	        return true;
 	    if (a.x - center.x < 0 && b.x - center.x >= 0)
@@ -721,159 +388,52 @@
 	            return a.y > b.y;
 	        return b.y > a.y;
 	    }
-
 	    // compute the cross product of vectors (center -> a) x (center -> b)
 	    var det = (a.x - center.x) * (b.y - center.y) - (b.x - center.x) * (a.y - center.y);
 	    if (det < 0)
 	        return true;
 	    if (det > 0)
 	        return false;
-
 	    // points a and b are on the same line from the center
 	    // check which point is closer to the center
 	    var d1 = (a.x - center.x) * (a.x - center.x) + (a.y - center.y) * (a.y - center.y);
 	    var d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
 	    return d1 > d2;
 	}
-
 	function getSubdividedShape(vertices, startPt, endPt){
 		var newVertices = [];
 		for(var i = vertices.indexOf(startPt) ; vertices[i] != endPt ; i++) {
 			newVertices.push(vertices[i]);
 			if(i >= vertices.length - 1) i = -1;
 		}
-<<<<<<< HEAD
-
-	}
-
-	function extrapolatePoints(mesh, pt1, pt2) {
-		//mesh vertices
-		var result = [];
-		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
-		var newPts = [];
-		var sitation = 0;
-
-		//flags
-		var left = 0;
-		var right = 0;
-		var top = 0;
-		var bottom = 0;
-
-		//3 triangle corner scenario
-		if (mesh.geometry.vertices.length == 3) {
-			var c1 = mesh.geometry.vertices[0];
-			var c2 = mesh.geometry.vertices[1];
-			var c3 = mesh.geometry.vertices[2];
-
-			//find possible points
-			var posPts = [];
-			posPts.push(lineIntersection(pt1, pt2, c1, c2));
-			posPts.push(lineIntersection(pt1, pt2, c3, c2));
-			posPts.push(lineIntersection(pt1, pt2, c1, c3));
-
-			//console.log(newPts);
-
-			var flag1 = flag2 = flag3 = false;
-
-			//check if within square (max, min xy vals)
-			for (var i = 0; i < posPts.length ; i++) {
-				var pos1 = Math.abs(posPts[i][0]);
-				var pos2 = Math.abs(posPts[i][1]);
-				var imwh = imageWidth / 2;
-				console.log(imwh);
-				var imhh = imageHeight / 2;
-				console.log(imhh);
-				if (!( (pos1 > imwh)|| (pos2 > imhh ))) {
-					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
-				}
-			}
-
-			if (newPts.length != 2) {
-				alert("ERROR");
-			}
-
-			//point is on left
-			for (var i = 0; i < 2; i++) {
-				if(newPts[i].y <= -(imageHeight / 2)) {
-					left = 1;
-				}
-				//point is on top
-				if(newPts[i].x <= imageWidth/2) {
-					top = 1;
-				}
-				//point is on right
-				if(newPts[i].y <= imageHeight / 2) {
-					right = 1;
-				}
-				//point is on bottom
-				if(newPts[i].x <= -(imageWidth/2)) {
-					bottom = 1;
-				}
-			}
-
-
-			if (top + left == 2) {
-				situation = 6;
-			} else if (top + right == 2) {
-				situation = 7;
-			} else if (right + bottom == 2) {
-				situation = 8;
-			} else if (bottom + left == 2) {
-				situation = 9;
-			}
-
-			result = [newPts, situation];
-
-		//4 base rectangle
-		} else if (mesh.geometry.vertices.length == 4) {
-			var c1 = mesh.geometry.vertices[0];
-			var c2 = mesh.geometry.vertices[1];
-			var c4 = mesh.geometry.vertices[2];
-			var c3 = mesh.geometry.vertices[3];
-
-			if (c4.x > c3.x) {
-				c3 = mesh.geometry.vertices[2];
-				c4 = mesh.geometry.vertices[3];
-			}
-=======
 		newVertices.push(endPt);
 		return newVertices;
 	}
-
 	function getSubdividedFaces(vertices) {
 		var faces = [];
 		var triangles = THREE.ShapeUtils.triangulateShape( vertices, [] );
-
 		for( var i = 0; i < triangles.length; i++ ){
-	    	faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
+	    	faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
 		}
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
-
 		return faces;
 	}
-
 	function subdivide (prevMesh, pt1, pt2)
-	{	
+	{
 		var vertices = prevMesh.geometry.vertices;
 		vertices.push(pt1);
 		vertices.push(pt2)
 		var centerPoint = getCenterPoint(prevMesh);
 		scene.remove(prevMesh);
-
 		objects.splice(objects.indexOf(prevMesh),1);
-
 		// coordinate automation
 		var plane1 = new THREE.Geometry();
 		var plane2 = new THREE.Geometry();
 		vertices.sort((a,b) => sortVertices(a,b,centerPoint));
-
-
 		plane1.vertices = getSubdividedShape(vertices, pt1, pt2);
 		plane2.vertices = getSubdividedShape(vertices, pt2, pt1);
-		
+
 		plane1.faces = getSubdividedFaces(plane1.vertices);
 		plane2.faces = getSubdividedFaces(plane2.vertices);
-
 		for (var i = 0; i < plane1.faces.length; i++) {
 			var v1 = plane1.vertices[plane1.faces[i].a];
 			var v2 = plane1.vertices[plane1.faces[i].b];
@@ -888,80 +448,13 @@
 		}
 		plane1.uvsNeedUpdate = true;
 		plane2.uvsNeedUpdate = true;
-
-<<<<<<< HEAD
-
-			//point is on bottom
-			for (var i = 0; i < 2; i++) {
-				if(newPts[i].y == -(imageHeight / 2)) {
-					bottom = 1;
-				}
-				//point is on right
-				if(newPts[i].x == imageWidth/2) {
-					right = 1;
-				}
-				//point is on top
-				if(newPts[i].y == imageHeight / 2) {
-					top = 1;
-				}
-				//point is on left
-				if(newPts[i].x == -(imageWidth/2)) {
-					left = 1;
-				}
-			}
-
-			if (top + left == 2) {
-				situation = 0;
-			} else if (top + right == 2) {
-				situation = 1;
-			} else if (right + bottom == 2) {
-				situation = 2;
-			} else if (bottom + left == 2) {
-				situation = 3;
-			} else if (top + bottom == 2) {
-				situation = 4;
-			} else if (left + right == 2) {
-				situation = 5;
-			}
-			result = [newPts, situation]
-		//five point shape
-		} else if (mesh.geometry.vertices.length == 5) {
-			var c1 = mesh.geometry.vertices[0];
-			var c2 = mesh.geometry.vertices[1];
-			var c3 = mesh.geometry.vertices[2];
-			var c4 = mesh.geometry.vertices[3];
-			var c5 = mesh.geometry.vertices[4];
-
-			//find possible points
-			var posPts = [];
-			posPts.push(lineIntersection(pt1, pt2, c1, c2));
-			posPts.push(lineIntersection(pt1, pt2, c2, c3));
-			posPts.push(lineIntersection(pt1, pt2, c3, c4));
-			posPts.push(lineIntersection(pt1, pt2, c4, c5));
-			posPts.push(lineIntersection(pt1, pt2, c5, c1));
-
-			// console.log(posPts);
-
-			//check if within square (max, min xy vals)
-			for (var i = 0; i < posPts.length ; i++) {
-				var pos1 = Math.abs(posPts[i][0]);
-				var pos2 = Math.abs(posPts[i][1]);
-				if (!( (pos1 > (imageWidth/2))|| (pos2 > (imageHeight/2)) )) {
-					newPts.push({x: posPts[i][0], y: posPts[i][1], z: 0});
-				}
-			}
-=======
 		var material1 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
 		uploadedImage.needsUpdate = true;
 		var mesh = new THREE.Mesh( plane1, material1 );
 
-		
 		var material2 = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});
 		uploadedImage.needsUpdate = true;
 		mesh2 = new THREE.Mesh( plane2, material2 );
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
-
-
 		scene.add(mesh);
 		objects.push(mesh);
 		objectCuts[mesh.uuid] = [pt1, pt2];
@@ -971,49 +464,13 @@
 		console.log(objects);
 		selectedToRotate = mesh2;
 		return prevMesh;
-		
+
 	}
-
-<<<<<<< HEAD
-			//point is on left
-			for (var i = 0; i < 2; i++) {
-				if(newPts[i].y <= -(imageHeight / 2)) {
-					left = 1;
-				}
-				//point is on top
-				if(newPts[i].x <= imageWidth/2) {
-					top = 1;
-				}
-				//point is on right
-				if(newPts[i].y <= imageHeight / 2) {
-					right = 1;
-				}
-				//point is on bottom
-				if(newPts[i].x <= -(imageWidth/2)) {
-					bottom = 1;
-				}
-			}
-
-
-			if (top + left == 2) {
-				situation = 10;
-			} else if (top + right == 2) {
-				situation = 11;
-			} else if (right + bottom == 2) {
-				situation = 12;
-			} else if (bottom + left == 2) {
-				situation = 13;
-			} else if (top + bottom == 2) {
-				situation = 14;
-			} else if (left + right == 2) {
-				situation = 15;
-			}
-=======
 	function extrapolatePoints(pt1, pt2) {
  		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
  		var y_a = pt1.y + slope*(imageWidth/2 - pt1.x);
  		var y_b = pt1.y + slope*(-imageWidth/2 - pt1.x);
- 
+
  		var x_a = (imageHeight/2 - pt1.y)/slope + pt1.x;
  		var x_b = (-imageHeight/2 - pt1.y)/slope + pt1.x;
  		var newPts = [];
@@ -1031,9 +488,6 @@
  		}
  		return newPts;
  	}
->>>>>>> 0497ae2c4e18c1fbea3c94da1ee8f95eb9d9d428
-
-
 	function getMeta(url){
 	    var img = new Image();
 	    img.onload = function(){
@@ -1042,7 +496,6 @@
 	    };
 	    img.src = url;
 	}
-
 	// Calculate Z axis from unprojected mouse click
 	function get3dPointZAxis()
 	{
@@ -1053,20 +506,16 @@
 		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
 		return pos;
 	}
-
 	function lineIntersection(a, b, c, d) {
 		var a1 = b.y - a.y;
 		var b1 = a.x - b.x;
 		var c1 = a1*a.x  + b1*a.y;
-
 		var a2 = d.y - c.y;
 		var b2 = c.x - d.x;
 		var c2 = a2*c.x  + b2*c.y;
-
 		var det = a1*b2 - a2 * b1;
 		if (det == 0) {
 			console.log("parallel");
-
 		} else {
 			var resx = Math.round((b2 * c1 - b1 * c2) / det);
 			var resy = Math.round((a1 * c2 - a2 * c1 ) / det);
@@ -1074,7 +523,6 @@
 		var result = [resx, resy];
 		return result;
 	}
-
 	function uvmap(v1, v2, v3) {
 		//image map for single face
 		var uv1x = (v1.x + (imageWidth / 2)) / (imageWidth);
@@ -1086,12 +534,9 @@
 		var uv3x = (v3.x + (imageWidth / 2)) / (imageWidth);
 		var uv3y = (v3.y + (imageHeight / 2)) / (imageHeight);
 		var uv3 = new THREE.Vector2(uv3x, uv3y);
-
 		var result = [uv1, uv2, uv3];
 		return result;
 	}
-
-
 	function animate()
 	{
 	  	requestAnimationFrame( animate );
