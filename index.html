@@ -37,11 +37,14 @@
 	var clock = new THREE.Clock();
 	// custom global variables
 	var mesh, mouseMesh;
+	//holds the selected shape
 	var selectedToRotate;
+	//flags for the different modes
 	var cutMode = true;
 	var rotateMode = selectMode = false;
 	//different from rotateMode, determines whether you are currently in drag rotation
 	var rotateOn = false;
+	//an array of the objects in the scene
 	var objects =[];
 	var mouse = {x: 0, y: 0};
 	var imageWidth = 500;
@@ -56,6 +59,7 @@
 	var coordsOnDown = [null,null];
 	var size;
 	var gui;
+	//default image
 	var imageurl = 'fbox.png';
 	// FUNCTIONS
 	function main()
@@ -72,7 +76,7 @@
 		var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
 		camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
 		scene.add(camera);
-		camera.position.set(0,0,1500);//camera.position.set(0,1000,1000);
+		camera.position.set(0,0,1500);
 		camera.lookAt(scene.position);
 		// RENDERER
 		if ( Detector.webgl )
@@ -97,7 +101,7 @@
 		var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0x9999ff, side: THREE.BackSide } );
 		var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 		scene.add(skyBox);
-		
+		//Alters the canvas dimensions using the user-inputed ratio
 		var d1 = d2 = 1;
 		d1 = document.getElementById("d1").value;
 		d2 = document.getElementById("d2").value;
@@ -108,62 +112,25 @@
 				imageWidth = 500 * (d2 / d1);
 			}
 		}
-		// var geometry = new THREE.SphereGeometry( 30, 32, 16 );
-		// var material = new THREE.MeshLambertMaterial( { color: 0x000088 } );
-		// mesh = new THREE.Mesh( geometry, material );
-		// mesh.position.set(0,40,0);
-		// scene.add(mesh);
-		// UPLOAD IMAGE
-		 //var imageurl = 'fbox.png';
-		 //dimension adaptation
-		var d1 = d2 = 1;
-		d1 = document.getElementById("d1").value;
-		d2 = document.getElementById("d2").value;
-		if (d1 && d2) {
-			if (d1 > d2) {
-			imageHeight = 500 * (d1 / d2);
-			} else {
-				imageWidth = 500 * (d2 / d1);
-			}
-		}
+		//image uploading (or default)
 		var imageurl = 'fbox.png';
 		if (document.getElementById("userImage").value) {
 			imageurl = document.getElementById("userImage").value;
 			imageurl = imageurl.split("\\")[2];
 		}
-		// var img= new Image();
-		// var imwidth;
-		// var imheight;
-		// img.onload = function(){
-  //       	imwidth = this.width;
-  //       	imheight = this.height;
-  //       	alert('1 '+this.width+' '+this.height);
-  //       	alert('2 '+imwidth+' '+imheight);
-  //   	};
-  //   	img.src = imageurl;
-  		// getMeta(imageurl);
-  		// imwidth = size.w;
-  		// imheight = size.h;
-    // 	alert('3 '+imwidth+' '+imheight);
+		//creation of canvas image
 		var ImageGeometry = new THREE.PlaneGeometry(imageWidth, imageHeight, 1, 1);
 		uploadedImage = new THREE.TextureLoader().load(imageurl);
-		// alert('4 '+imwidth+' '+imheight);
-		// console.log(imwidth);
-  //   	console.log(imheight);
-		//var texture = new THREE.CanvasTexture('js/rocks.jpg');
-		//var ImageMaterial = new THREE.MeshBasicMaterial({color: 0xffffff});
-		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//({color: 0xffff00});
+
+		var ImageMaterial = new THREE.MeshBasicMaterial({map : uploadedImage, side: THREE.DoubleSide});//
 		ImageMaterial.map.needsUpdate = true;
-		//var ImageMaterial = new THREE.MeshBasicMaterial({map : image, side: THREE.DoubleSide});//
 		mesh = new THREE.Mesh( ImageGeometry, ImageMaterial );
-		console.log(mesh);
-		// mesh.position.set(0,100,0);
+		//console.log(mesh);
 		scene.add( mesh );
 		objects.push(mesh);
 		selectedToRotate = objects[0];
 		scene.updateMatrixWorld(true);
 		// Create a circle around the mouse and move it
-		// The sphere has opacity 0
 		var mouseGeometry = 	new THREE.SphereGeometry( 10, 32, 32 );
 		var mouseMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
 		mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
@@ -213,6 +180,7 @@
 		mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 	 	// Make the sphere follow the mouse
 		mouseMesh.position.copy(get3dPointZAxis());
+		//behavior for object rotation
 		if (rotateMode && rotateOn)
 		{
 			var currentCut = objectCuts[selectedToRotate.uuid];
@@ -231,6 +199,7 @@
 		}
 	//	mouseMesh.position.set(event.clientX, event.clientY, 0);
 	};
+	//updates the current rotation of an object based on distance (FOLDING)
 	function updateCurRotation() {
 		var sign = 1;
 		if (coordsOnDown[0] > mouse.x) {
@@ -238,10 +207,12 @@
 		}
 		return sign * Math.PI * distance2D(coordsOnDown[0], coordsOnDown[1], mouse.x, mouse.y);
 	};
+	//
 	function onMouseDown(event) {
 		coordsOnDown = [mouse.x, mouse.y];
 		rotateOn = true;
 	};
+	//
 	function onMouseUp(event) {
 		// drag event not click
 		if(coordsOnDown[0] != mouse.x || coordsOnDown[1] != mouse.y) {
@@ -251,14 +222,16 @@
 				objectRotations[selectedToRotate.uuid][1] += updateCurRotation();
 			return;
 		}
+		//behavior for CUT mode
 		if (cutMode)
 		{
 			if (!selectedToRotate) return;
 			linePoints.push(get3dPointZAxis());
 			if(linePoints.length >= 2) {
-				//create a blue LineBasicMaterial
+				//create a blue LineBasicMaterial - no longer relevant
 				var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 				var geometry = new THREE.Geometry();
+				//finds interection points if existing
 				linePoints= extrapolatePoints(linePoints[0],linePoints[1]);
 				for (var i = 0; i < pastLineSegments.length; i++) {
 					if (isIntersecting(linePoints[0], linePoints[1], pastLineSegments[i][0], pastLineSegments[i][1])) {
@@ -280,6 +253,7 @@
 				linePoints = [];
 			}
 		}
+		//behavior for SELECT mode
 		if (selectMode)
 		{
 			var mouse3D = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1,
@@ -291,13 +265,14 @@
 			if ( intersects.length > 0 )
 			{
 				selectObject(intersects[0].object);
-				console.log("object selected");
-				console.log(selectedToRotate);
+				//console.log("object selected");
+				//console.log(selectedToRotate);
 			}
 			linePoints = [];
 		}
 		rotateOn = false;
 	};
+	//on new object selection
 	function selectObject(object) {
 		if(!object) return;
 		if(selectedToRotate) {
@@ -307,8 +282,8 @@
 		object.material.transparent = true;
 		selectedToRotate = object;
 	}
+	//mode switching GUI
 	function makeGUI(initValue) {
-		// GUI implementatio
 		if(gui)
 			gui.destroy();
 	  	gui = new dat.GUI();
@@ -321,6 +296,7 @@
 		{  setMode(); });
 		gui.open();
 	}
+	//mode switching through keys
 	function onDocumentKeyDown(event) {
 		var keyCode = event.which;
 		if (selectedToRotate && keyCode == 68) {
@@ -363,12 +339,14 @@
         return this;
     	}
 	}();
+	//simple 2d distance calculation from 2 points
 	function distance2D (x1, y1, x2, y2)
 	{
 		var dx = x1 - x2;
 		var dy = y1 - y2;
 		return Math.sqrt( dx * dx + dy * dy);
 	};
+	//calculates an object's center (potential use for axis correspondence)
 	function getCenterPoint(mesh) {
 	    var middle = new THREE.Vector3();
 	    var geometry = mesh.geometry;
@@ -379,6 +357,7 @@
 	    mesh.localToWorld( middle );
 	    return middle;
 	}
+	//sorts vertices for easy use in subdivision
 	function sortVertices(a, b, center)
 	{
 	    if (a.x - center.x >= 0 && b.x - center.x < 0)
@@ -402,6 +381,7 @@
 	    var d2 = (b.x - center.x) * (b.x - center.x) + (b.y - center.y) * (b.y - center.y);
 	    return d1 > d2;
 	}
+	//produces subdivided shape from vertices
 	function getSubdividedShape(vertices, startPt, endPt){
 		var newVertices = [];
 		for(var i = vertices.indexOf(startPt) ; vertices[i] != endPt ; i++) {
@@ -411,6 +391,7 @@
 		newVertices.push(endPt);
 		return newVertices;
 	}
+	//produces shape faces from vertices
 	function getSubdividedFaces(vertices) {
 		var faces = [];
 		var triangles = THREE.ShapeUtils.triangulateShape( vertices, [] );
@@ -419,6 +400,7 @@
 		}
 		return faces;
 	}
+	//creates 2 new shapes from an existing shape and interesction
 	function subdivide (prevMesh, pt1, pt2)
 	{
 		var vertices = prevMesh.geometry.vertices;
@@ -463,11 +445,12 @@
 		scene.add(mesh2);
 		objects.push(mesh2);
 		objectCuts[mesh2.uuid] = [pt1, pt2];
-		console.log(objects);
+		//console.log(objects);
 		selectedToRotate = mesh2;
 		return prevMesh;
 
 	}
+	//extrapolates 2 points
 	function extrapolatePoints(pt1, pt2) {
  		var slope = (pt1.y - pt2.y)/(pt1.x - pt2.x);
  		var y_a = pt1.y + slope*(imageWidth/2 - pt1.x);
@@ -490,10 +473,11 @@
  		}
  		return newPts;
  	}
+ 	//simplifies URL for image uploading use
 	function getMeta(url){
 	    var img = new Image();
 	    img.onload = function(){
-	        alert( this.width+' '+ this.height );
+	        //alert( this.width+' '+ this.height );
 	        size = {w: this.width, h: this.height};
 	    };
 	    img.src = url;
@@ -508,6 +492,7 @@
 		var pos = camera.position.clone().add( dir.multiplyScalar( distance ) );
 		return pos;
 	}
+	//calculates intersection point of 2 lines
 	function lineIntersection(a, b, c, d) {
 		var a1 = b.y - a.y;
 		var b1 = a.x - b.x;
@@ -525,8 +510,8 @@
 		var result = [resx, resy];
 		return result;
 	}
+	//image map for single face with 3 vertices
 	function uvmap(v1, v2, v3) {
-		//image map for single face
 		var uv1x = (v1.x + (imageWidth / 2)) / (imageWidth);
 		var uv1y = (v1.y + (imageHeight / 2)) / (imageHeight);
 		var uv1 = new THREE.Vector2(uv1x, uv1y);
